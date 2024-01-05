@@ -15,7 +15,7 @@ fi
 set -xe
 
 CFLAGS="$CFLAGS -g -Wall -Wextra -Wpedantic -std=gnu99 -ffreestanding -fPIE -m64 -march=x86-64"
-LDFLAGS="$LDFLAGS -nostdlib -static -pie --no-dynamic-linker -z text -z max-page-size=0x1000 -T src/linker.ld -Map=build/os.map"
+LDFLAGS="$LDFLAGS -nostdlib -static --no-dynamic-linker -z text -z max-page-size=0x1000 -T src/linker.ld -Map=build/os.map"
 INCLUDES="$INCLUDES "
 DEFINES="$DEFINES "
 
@@ -27,21 +27,24 @@ OBJS=""
 CFILES=$(find src/ -name "*.c")
 ASMFILES=$(find src/ -name "*.s")
 
-if [ "$ASMFILES" ]; then
-	for f in $ASMFILES; do
-		OBJNAME=$(echo "$f" | sed -e "s/\.s/\.o/" -e "s/src/obj/")
-		nasm -felf64 "$f" -o "$OBJNAME"
-		OBJS="$OBJNAME $OBJS"
-	done
-fi
+# had to stop using the linker since nasm refuses to let me change the origin, so all addresses are off by 0x7c00 lmao
+nasm -g -fbin src/boot.s -o build/boot.bin
 
-if [ "$CFILES" ]; then
-	for f in src/*.c; do
-		OBJNAME=$(echo "$f" | sed -e "s/\.c/\.o/" -e "s/src/obj/")
-		$CC $CFLAGS $DEFINES $INCLUDES -o "$OBJNAME" -c "$f"
-		OBJS="$OBJNAME $OBJS"
-	done
-fi
-
-$LD $OBJS $LDFLAGS -o build/os.bin
+#if [ "$ASMFILES" ]; then
+#	for f in $ASMFILES; do
+#		OBJNAME=$(echo "$f" | sed -e "s/\.s/\.o/" -e "s/src/obj/")
+#		nasm -felf64 "$f" -o "$OBJNAME"
+#		OBJS="$OBJNAME $OBJS"
+#	done
+#fi
+#
+#if [ "$CFILES" ]; then
+#	for f in src/*.c; do
+#		OBJNAME=$(echo "$f" | sed -e "s/\.c/\.o/" -e "s/src/obj/")
+#		$CC $CFLAGS $DEFINES $INCLUDES -o "$OBJNAME" -c "$f"
+#		OBJS="$OBJNAME $OBJS"
+#	done
+#fi
+#
+#$LD $OBJS $LDFLAGS -o build/os.bin
 
