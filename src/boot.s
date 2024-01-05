@@ -11,11 +11,27 @@
 
 ; there are currently no other partitions so no entries are currently set
 
+bits 16
+
 section .bootstrap
 global _start
 _start:
 	cli
-	hlt
+	mov ah, 0x00
+	mov al, 0x13
+	int 0x10
+
+
+	mov cl, 0
+	mov ax, 0xA000
+	mov ds, ax
+	mov di, 0xFA00 ; 320x200 in hex
+fillScreen:
+	mov byte ds:[di], cl
+	inc cl
+	dec di
+	or di, di
+	jnz fillScreen
 loop:
 	jmp loop
 
