@@ -51,7 +51,6 @@ swapSkip:
 	cmp di, 0xFA00
 	jnz fillScreen
 
-	xchg bx, bx
 	jmp 0x00:initCS
 initCS:
 	xor ax, ax
@@ -63,7 +62,6 @@ initCS:
 
 
 	; set up gdt
-	xchg bx, bx
 	lgdt [gdtr]
 	; enter protected mode
 	; https://wiki.osdev.org/Protected_Mode
@@ -80,7 +78,16 @@ reloadSegments:
 	mov gs, ax
 	mov ss, ax
 
-	; enter protected mode
+	; set a20 line
+	; fast a20 should be fine since I doubt I'll run this on anything that doesn't have it
+	in al, 0x92
+	test al, 2
+	jnz a20skip
+	or al, 2
+	and al, 0xfe
+	out 0x92, al
+a20skip:
+
 
 loop:
 	jmp loop
