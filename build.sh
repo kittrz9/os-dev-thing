@@ -18,7 +18,7 @@ if [ -z "$(command -v "$LD")" ]; then
 fi
 
 CFLAGS="$CFLAGS -g -Wall -Wextra -Wpedantic -std=gnu99 -ffreestanding -fPIE -m64 -march=x86-64"
-LDFLAGS="$LDFLAGS -nostdlib -static --no-dynamic-linker -z text -z max-page-size=0x1000 -T src/linker.ld -Map=build/os.map"
+LDFLAGS="$LDFLAGS -nostdlib -static --no-dynamic-linker -z text -z max-page-size=0x1000"
 INCLUDES="$INCLUDES "
 DEFINES="$DEFINES "
 
@@ -33,6 +33,11 @@ ASMFILES=$(find src/ -name "*.s")
 # had to stop using the linker since nasm refuses to let me change the origin, so all addresses are off by 0x7c00 lmao
 nasm -g -fbin src/boot.s -o build/boot.bin
 
+. ./src/stage2/build.sh
+
+# combine bootsector and stage2
+cat build/boot.bin build/stage2.bin > build/os.bin
+
 #if [ "$ASMFILES" ]; then
 #	for f in $ASMFILES; do
 #		OBJNAME=$(echo "$f" | sed -e "s/\.s/\.o/" -e "s/src/obj/")
@@ -40,7 +45,7 @@ nasm -g -fbin src/boot.s -o build/boot.bin
 #		OBJS="$OBJNAME $OBJS"
 #	done
 #fi
-#
+
 #if [ "$CFILES" ]; then
 #	for f in src/*.c; do
 #		OBJNAME=$(echo "$f" | sed -e "s/\.c/\.o/" -e "s/src/obj/")
@@ -48,6 +53,6 @@ nasm -g -fbin src/boot.s -o build/boot.bin
 #		OBJS="$OBJNAME $OBJS"
 #	done
 #fi
-#
+
 #$LD $OBJS $LDFLAGS -o build/os.bin
 

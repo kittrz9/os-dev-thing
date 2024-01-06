@@ -78,6 +78,7 @@ fi
 export PATH="$PATH:$PREFIX/bin/"
 export CC="$TARGET-gcc"
 export LD="$TARGET-ld"
+export OBJCOPY="$TARGET-objcopy"
 
 if [ -z "$(command -v $CC)" ]; then
 	echo "cross compiler not found"

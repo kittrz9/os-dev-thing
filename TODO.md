@@ -2,6 +2,7 @@
  - read stage 2 into ram
 	- probably will have it at the first bootable partition
  - load kernel
+	- maybe on the second partition?
  - implement serial output
 
 <hr>

@@ -88,7 +88,6 @@ reloadSegments:
 	out 0x92, al
 a20skip:
 
-
 loop:
 	jmp loop
 
