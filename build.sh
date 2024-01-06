@@ -1,18 +1,21 @@
 #!/bin/sh
 
+set -xe
 
-# THIS NEEDS TO BE CHANGED ANY TIME THE CROSS COMPILER IS MOVED OR (RE)BUILT
-export PATH="/mnt/disk1/cross-compiler/build-cross-x86_64/gcc-13.2.0/bin:$PATH"
+ORIGIN_DIR="$(readlink -f "$(dirname "$0")")"
+export ORIGIN_DIR
 
-CC=x86_64-elf-gcc
-LD=x86_64-elf-ld
+# I don't think you can use the source command in posix sh
+# so I gotta use this instead
+# https://stackoverflow.com/questions/11588583/is-the-shells-source-posix-standard
+. ./get-tools.sh
 
-if [ -z "$(command -v $LD)" ]; then
+cd "$ORIGIN_DIR"
+
+if [ -z "$(command -v "$LD")" ]; then
 	echo "cross compiler not found"
 	exit 1
 fi
-
-set -xe
 
 CFLAGS="$CFLAGS -g -Wall -Wextra -Wpedantic -std=gnu99 -ffreestanding -fPIE -m64 -march=x86-64"
 LDFLAGS="$LDFLAGS -nostdlib -static --no-dynamic-linker -z text -z max-page-size=0x1000 -T src/linker.ld -Map=build/os.map"
