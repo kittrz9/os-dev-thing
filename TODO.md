@@ -3,7 +3,9 @@
 	- probably will have it at the first bootable partition
  - load kernel
  - implement serial output
+
 <hr>
+
 # things that I don't really need to do but want to do eventually
  - get better video output
 	- get full 26 bit rgb output
