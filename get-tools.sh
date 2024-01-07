@@ -28,7 +28,7 @@ fi
 # assuming the compiler is new enough to not need to bootstrap
 PREFIX="$ORIGIN_DIR/tools/cross-compiler"
 mkdir -p "$PREFIX"
-TARGET="x86_64-none-elf"
+TARGET="i686-elf"
 BINUTILS_DIR="binutils-cross"
 GCC_DIR="gcc-cross"
 

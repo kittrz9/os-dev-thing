@@ -60,7 +60,7 @@ swapSkip:
 	mov es, bx
 	cld
 	mov ah, 0x02
-	mov al, 1
+	mov al, 2 ; really need to figure out a way to get the sector count of stage2 automatically lmao
 	mov ch, 0
 	mov cl, 2
 	mov dh, 0
@@ -104,7 +104,6 @@ reloadSegments:
 	out 0x92, al
 a20skip:
 
-	bochs_brk
 
 	call 0x7e00
 

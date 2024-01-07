@@ -17,7 +17,7 @@ if [ -z "$(command -v "$LD")" ]; then
 	exit 1
 fi
 
-CFLAGS="$CFLAGS -g -Wall -Wextra -Wpedantic -std=gnu99 -ffreestanding -fPIE -m64 -march=x86-64"
+CFLAGS="$CFLAGS -g -Wall -Wextra -Wpedantic -std=gnu99 -ffreestanding -fPIE -march=i686"
 LDFLAGS="$LDFLAGS -nostdlib -static --no-dynamic-linker -z text -z max-page-size=0x1000"
 INCLUDES="$INCLUDES "
 DEFINES="$DEFINES "

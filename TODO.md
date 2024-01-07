@@ -1,9 +1,8 @@
 # things I need to do
- - read stage 2 into ram
-	- probably will have it at the first bootable partition
+ - get size of stage2.bin in sectors (512b) automatically into boot.s
  - load kernel
 	- maybe on the second partition?
- - implement serial output
+ - output hex numbers to serial output
 
 <hr>
 
