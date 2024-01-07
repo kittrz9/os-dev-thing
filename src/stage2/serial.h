@@ -1,6 +1,8 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+#include <stdint.h>
+
 #define COM1 0x3F8
 #define COM2 0x2F8
 
@@ -19,5 +21,6 @@ void initSerial(void);
 
 void serialWriteChar(char c);
 void serialWriteStr(char* str);
+void serialWriteHex32(uint32_t n);
 
 #endif

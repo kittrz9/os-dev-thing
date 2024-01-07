@@ -35,7 +35,7 @@ enum SERIAL_STATUS {
 };
 
 uint8_t transmitEmpty(void) {
-	return inb(COM1 + 5) & 0x20;
+	return inb(COM1LINESTATUS) & SERIAL_THRE;
 }
 
 void serialWriteChar(char c) {
@@ -50,6 +50,23 @@ void serialWriteStr(char* str) {
 		serialWriteChar(*str++);
 	}
 
+	return;
+}
+
+void serialWriteHex32(uint32_t n) {
+	char hexLUT[] = "0123456789ABCDEF";
+	char str[] = "0x00000000\n";
+
+	char* ptr = str + 8;
+	while(n != 0) {
+		*(ptr+1) = hexLUT[n & 0x0F];
+		*(ptr+0) = hexLUT[(n & 0xF0)>>4];
+		n = n >> 8;
+		ptr -= 2;
+	}
+
+	serialWriteStr(str);
+	
 	return;
 }
 

@@ -1,7 +1,6 @@
 # things I need to do
  - load kernel
 	- maybe on the second partition?
- - output hex numbers to serial output
 
 <hr>
 
