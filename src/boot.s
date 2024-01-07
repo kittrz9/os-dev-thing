@@ -15,13 +15,17 @@
 ; boot partition will always be part 1
 ; stage2 of the bootloader will be on that boot partition
 
+%macro bochs_brk 0
+	xchg bx, bx
+%endmacro
+
+
 org 0x7c00
 bits 16
 
 global _start
 _start:
 	cli
-
 
 	; set up stack
 	mov sp, 0x7c00 ; value copied from limine since idk where to put it other than right before the boot code
@@ -51,6 +55,19 @@ swapSkip:
 	cmp di, 0xFA00
 	jnz fillScreen
 
+	xor bx, bx
+	mov ds, bx
+	mov es, bx
+	cld
+	mov ah, 0x02
+	mov al, 1
+	mov ch, 0
+	mov cl, 2
+	mov dh, 0
+	mov bx, 0x7e00
+	int 0x13
+
+
 	jmp 0x00:initCS
 initCS:
 	xor ax, ax
@@ -59,7 +76,6 @@ initCS:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-
 
 	; set up gdt
 	lgdt [gdtr]
@@ -87,6 +103,10 @@ reloadSegments:
 	and al, 0xfe
 	out 0x92, al
 a20skip:
+
+	bochs_brk
+
+	call 0x7e00
 
 loop:
 	jmp loop
