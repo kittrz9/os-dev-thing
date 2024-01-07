@@ -1,5 +1,4 @@
 # things I need to do
- - get size of stage2.bin in sectors (512b) automatically into boot.s
  - load kernel
 	- maybe on the second partition?
  - output hex numbers to serial output
