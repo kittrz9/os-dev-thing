@@ -68,7 +68,7 @@ swapSkip:
 	mov bx, 0x7e00
 	int 0x13
 
-
+	; I think this part and the other part that reloads segments are basically also from seeing how limine does this and basically copying
 	jmp 0x00:initCS
 initCS:
 	xor ax, ax

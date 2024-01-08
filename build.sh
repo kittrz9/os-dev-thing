@@ -27,9 +27,6 @@ mkdir -p build/ obj/
 
 OBJS=""
 
-CFILES=$(find src/ -name "*.c")
-ASMFILES=$(find src/ -name "*.s")
-
 . ./src/stage2/build.sh
 
 # incredibly jank solution to getting the stage2 size into boot.s lmao
