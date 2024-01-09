@@ -5,7 +5,6 @@
 <hr>
 
 # things that I don't really need to do but want to do eventually
- - figure out double buffering with the weird vesa framebuffer
  - get audio output
 	- maybe just pc beeper, though ideally would want something with PCM
 	- maybe AC97

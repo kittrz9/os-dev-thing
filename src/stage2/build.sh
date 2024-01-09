@@ -2,6 +2,8 @@
 
 cd "$ORIGIN_DIR"
 
+CFLAGS="$CFLAGS -O2"
+
 CFILES="$(find src/stage2/ -name "*.c")"
 for f in $CFILES; do
 	OBJNAME="$(echo "$f" | sed -e "s/\.c/\.o/" -e "s/src/obj/")"
