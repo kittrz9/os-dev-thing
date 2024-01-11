@@ -20,9 +20,9 @@ for f in $CFILES; do
 	OBJS="$OBJNAME $OBJS"
 done
 
-ASMFILES="$(find src/stage2/ -name "*.s")"
+ASMFILES="$(find src/stage2/ -name "*.asm")"
 for f in $ASMFILES; do
-	OBJNAME="$(echo "$f" | sed -e "s/\.c/\.o/" -e "s/src/obj/")"
+	OBJNAME="$(echo "$f" | sed -e "s/\.asm/\.o/" -e "s/src/obj/")"
 	echo "obj $OBJNAME"
 	OBJDIR="$(dirname $OBJNAME)"
 	echo "dir $OBJDIR"
