@@ -3,9 +3,7 @@
 #include "screen.h"
 
 void loadIDT(void);
-void test(void) {
-	serialWriteStr("asdf\n");
-}
+
 void stage2(void) {
 	initSerial();
 
