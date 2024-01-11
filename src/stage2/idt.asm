@@ -36,7 +36,30 @@ interruptHandler:
 	; acknowledge to PIC
 	mov al, 0x20
 	out 0x20, al
+	in al, 0x60 ; discard scancode
 	add esp, 4
+	popad
+	iret
+
+section .rodata
+scancodeStr:
+		db "scancode: ", 0x0
+
+extern serialWriteHex32
+section .text
+keyboardHandler:
+	pushad
+	sub esp, 4
+	lea eax, scancodeStr
+	mov [esp], eax
+	call serialWriteStr
+	xor eax, eax
+	in al, 0x60
+	mov [esp], eax
+	call serialWriteHex32
+	add esp, 4
+	mov al, 0x20
+	out 0x20, al
 	popad
 	iret
 
@@ -65,7 +88,7 @@ setIDTEntry:
 
 global loadIDT
 loadIDT:
-	mov eax, 0
+	xor eax, eax
 	sub esp, 12
 	mov dword [esp], interruptHandler
 isrLoop:
@@ -74,6 +97,12 @@ isrLoop:
 	inc eax
 	cmp eax, isrCount
 	jng isrLoop
+
+	mov eax, 33
+	mov dword [esp], keyboardHandler
+	mov dword [esp+4], eax
+	call setIDTEntry
+
 	lidt [idtr]
 	xchg bx, bx
 	sti

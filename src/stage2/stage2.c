@@ -1,6 +1,7 @@
 #include "serial.h"
 #include "io.h"
 #include "screen.h"
+#include "pic.h"
 
 void loadIDT(void);
 
@@ -15,6 +16,16 @@ void stage2(void) {
 	serialWriteHex32(0xbee5bee5);
 
 	loadIDT();
+
+	PICInit();
+
+	uint8_t id = 0;
+	do {
+		PICSetMask(id);
+		++id;
+	} while(id != 0); // funny overflow moment
+	PICClearMask(1); // keyboard
+	//PICClearMask(0); // timer
 
 	uint8_t hue = 0;
 	while(1) {
