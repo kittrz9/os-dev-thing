@@ -4,6 +4,8 @@
 
 // https://wiki.osdev.org/Serial_Ports#Example_Code
 
+uint8_t serialEnable = 1;
+
 void initSerial(void) {
 	outb(COM1INT, 0x00);
 	outb(COM1LINECONTROL, 0x80); // set dlab
@@ -16,7 +18,8 @@ void initSerial(void) {
 	outb(COM1DATA, 0xAE);
 
 	if(inb(COM1DATA) != 0xAE) {
-		__asm__ volatile ("cli; hlt");
+		// serial just stopped working on bochs after I started using vesa stuff so this prevents it from just dying due to that
+		serialEnable = 0;
 	}
 
 	outb(COM1MODEM, 0x0F);
@@ -39,6 +42,7 @@ uint8_t transmitEmpty(void) {
 }
 
 void serialWriteChar(char c) {
+	if(!serialEnable) { return; }
 	while(!transmitEmpty());
 
 	outb(COM1DATA, c);

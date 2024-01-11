@@ -60,6 +60,10 @@ struct vbe_mode_info_structure {
 	uint8_t reserved1[206];
 } __attribute__ ((packed));
 
+void loadIDT(void);
+void test(void) {
+	serialWriteStr("asdf\n");
+}
 void stage2(void) {
 	initSerial();
 
@@ -71,6 +75,8 @@ void stage2(void) {
 
 	serialWriteStr("waga baba bobo\n");
 	serialWriteHex32(0xbee5bee5);
+
+	loadIDT();
 
 	uint8_t hue = 0;
 	while(1) {

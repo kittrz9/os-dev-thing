@@ -3,6 +3,10 @@ OUTPUT_FORMAT("elf32-i386")
 ENTRY(stage2)
 
 SECTIONS {
+	. = 0x0;
+	.bss : {
+		*(.bss)
+	}
 	. = 0x7e00;
 	.text : {
 		*(.entry)

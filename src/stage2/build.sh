@@ -3,6 +3,7 @@
 cd "$ORIGIN_DIR"
 
 CFLAGS="$CFLAGS -O2"
+LDFLAGS="$LDFLAGS -Os"
 
 CFILES="$(find src/stage2/ -name "*.c")"
 for f in $CFILES; do

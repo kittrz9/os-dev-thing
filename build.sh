@@ -40,3 +40,5 @@ nasm -fbin src/boot.s -o build/boot.bin
 # combine bootsector and stage2
 cat build/boot.bin build/stage2.bin > build/os.bin
 
+truncate build/os.bin -s "$(echo "($SECTOR_COUNT + 1) * 512" | bc)"
+
