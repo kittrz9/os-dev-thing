@@ -6,15 +6,17 @@ idtr:
 	dd idt ; offset (32 bit)
 
 isrCount equ 255
+isrFlags equ 10001110b
 
+section .bss
 align 4
 idt:
 %rep isrCount
-	dw 0x0000 ; offset low
-	dw 0x0008; segment
-	db 0x00 ; unused
-	db 10001110b ; present bit, DPL(2 bits), 0, gate type (4 bits)
-	dw 0x0000; offset high
+	resw 1 ; offset low
+	resw 1; segment
+	resb 1 ; unused
+	resb 1 ; flags
+	resw 1 ; offset high
 %endrep
 idtEnd:
 
@@ -47,6 +49,10 @@ setIDTEntry:
 	mov [edi], ax
 	shr eax, 16
 	mov [edi+6], ax
+	mov eax, 0x008
+	mov [edi+2], ax
+	mov al, isrFlags
+	mov [edi+5], al
 	pop edi
 	pop ecx
 	pop eax
@@ -55,7 +61,6 @@ setIDTEntry:
 
 global loadIDT
 loadIDT:
-	xchg bx, bx
 	mov eax, 0
 	sub esp, 12
 	mov dword [esp], interruptHandler
