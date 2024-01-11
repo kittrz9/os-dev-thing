@@ -9,8 +9,6 @@ void stage2(void) {
 
 	struct vbe_mode_info_structure* vbeInfo = (struct vbe_mode_info_structure*)0x1000;
 
-	serialWriteHex32(vbeInfo->framebuffer);
-
 	uint8_t* fbPtr = vbeInfo->framebuffer;
 
 	serialWriteStr("waga baba bobo\n");

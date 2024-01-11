@@ -28,13 +28,17 @@ extern serialWriteStr
 section .text
 align 4
 interruptHandler:
-	cli
+	pushad
+	sub esp, 4
 	lea eax, str
 	mov [esp], eax
 	call serialWriteStr
-loop:
-	hlt
-	jmp loop
+	; acknowledge to PIC
+	mov al, 0x20
+	out 0x20, al
+	add esp, 4
+	popad
+	iret
 
 setIDTEntry:
 	push ebp
