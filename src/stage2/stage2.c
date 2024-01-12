@@ -2,6 +2,7 @@
 #include "io.h"
 #include "screen.h"
 #include "pic.h"
+#include "timer.h"
 
 void loadIDT(void);
 
@@ -25,7 +26,14 @@ void stage2(void) {
 		++id;
 	} while(id != 0); // funny overflow moment
 	PICClearMask(1); // keyboard
-	//PICClearMask(0); // timer
+
+	//timerSetFreq(2, TIMER_SQUARE2, 440);
+	timerSetFreqDiv(0, TIMER_SQUARE2, 1194); // ~1ms
+	PICClearMask(0); // timer
+	/*uint8_t tmp = inb(0x61);
+	if(tmp != (tmp|3)){
+		outb(0x61, tmp | 3);
+	}*/
 
 	uint8_t hue = 0;
 	while(1) {
@@ -46,9 +54,7 @@ void stage2(void) {
 		}
 		++hue;
 
-		// stall
-		for(volatile uint16_t i = 0; i < UINT16_MAX/4; ++i) {
-		}
+		sleep(20);
 
 	}
 

@@ -41,6 +41,22 @@ interruptHandler:
 	popad
 	iret
 
+; https://wiki.osdev.org/Programmable_Interval_Timer#Using_the_IRQ_to_Implement_sleep
+extern countDown
+align 4
+timerHandler:
+	push eax
+	mov eax, [countDown]
+	test eax, eax
+	jz timerDone
+	dec eax
+	mov [countDown], eax
+timerDone:
+	mov al, 0x20
+	out 0x20, al
+	pop eax
+	iret
+
 section .rodata
 scancodeStr:
 		db "scancode: ", 0x0
@@ -97,6 +113,11 @@ isrLoop:
 	inc eax
 	cmp eax, isrCount
 	jng isrLoop
+
+	mov eax, 32
+	mov dword [esp], timerHandler
+	mov dword [esp+4], eax
+	call setIDTEntry
 
 	mov eax, 33
 	mov dword [esp], keyboardHandler
