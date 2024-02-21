@@ -46,5 +46,8 @@ struct vbe_mode_info_structure {
 } __attribute__ ((packed));
 
 extern struct vbe_mode_info_structure vbeInfo;
+extern uint8_t* backBuffer;
+
+void refreshScreen();
 
 #endif

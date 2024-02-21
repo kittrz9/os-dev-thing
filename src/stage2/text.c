@@ -5,7 +5,7 @@
 void drawChar(char c, uint16_t x, uint16_t y) {
 	if(c <= ' ' || c >= 127) return;
 	uint16_t pitch = vbeInfo.pitch;
-	uint8_t* ptr = (uint8_t*)vbeInfo.framebuffer + (y*pitch + x*3);
+	uint8_t* ptr = (uint8_t*)backBuffer + (y*pitch + x*3);
 	uint8_t fontIndex = c - '!';
 	for(uint16_t i = fontIndex*16*8; i <(fontIndex+1)*16*8; ++i) {
 		if(i != fontIndex*16*8 && i%fontW == 0) {
