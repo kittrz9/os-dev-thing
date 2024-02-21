@@ -4,6 +4,7 @@
 #include "pic.h"
 #include "timer.h"
 #include "text.h"
+#include "keyboard.h"
 
 void loadIDT(void);
 
@@ -54,6 +55,7 @@ void stage2(void) {
 		++hue;
 
 		drawStr("https://kittrz.gay/\n\nwaga baba bobo\n\nbasic text rendering!!!!!",0,0);
+		drawStr(keyboardStr,0,100);
 
 		refreshScreen();
 

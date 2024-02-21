@@ -62,17 +62,19 @@ scancodeStr:
 		db "scancode: ", 0x0
 
 extern serialWriteHex32
+extern handleScancode
 section .text
 keyboardHandler:
 	pushad
 	sub esp, 4
-	lea eax, scancodeStr
-	mov [esp], eax
-	call serialWriteStr
+;	lea eax, scancodeStr
+;	mov [esp], eax
+;	call serialWriteStr
 	xor eax, eax
 	in al, 0x60
 	mov [esp], eax
-	call serialWriteHex32
+	;call serialWriteHex32
+	call handleScancode
 	add esp, 4
 	mov al, 0x20
 	out 0x20, al
