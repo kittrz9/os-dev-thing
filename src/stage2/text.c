@@ -27,6 +27,10 @@ void drawStr(char* str, uint16_t x, uint16_t y) {
 			x = startX;
 			y += 16;
 		} else {
+			if(x >= 640) {
+				x = startX;
+				y += 16;
+			}
 			drawChar(*str, x, y);
 			x += 8;
 		}

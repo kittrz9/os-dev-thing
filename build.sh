@@ -8,7 +8,7 @@ export ORIGIN_DIR
 # I don't think you can use the source command in posix sh
 # so I gotta use this instead
 # https://stackoverflow.com/questions/11588583/is-the-shells-source-posix-standard
-. ./get-tools.sh
+. ./getTools.sh
 
 cd "$ORIGIN_DIR"
 

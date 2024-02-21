@@ -2,7 +2,7 @@
 #include "serial.h"
 #include "text.h"
 
-char keyboardStr[32];
+char keyboardStr[256];
 uint8_t shift = 0;
 
 char scancodeLUT[] = {
@@ -31,7 +31,7 @@ char scancodeLUT[] = {
 	[0x19] = 'p',
 	[0x1a] = '[',
 	[0x1b] = ']',
-	[0x1c] = ' ',
+	[0x1c] = '\n',
 	[0x1e] = 'a',
 	[0x1f] = 's',
 	[0x20] = 'd',
@@ -80,7 +80,7 @@ char shiftScancodeLUT[] = {
 	[0x19] = 'P',
 	[0x1a] = '{',
 	[0x1b] = '}',
-	[0x1c] = '|',
+	[0x1c] = '\n',
 	[0x1e] = 'A',
 	[0x1f] = 'S',
 	[0x20] = 'D',
@@ -117,7 +117,8 @@ void handleScancode(uint8_t scancode) {
 		shift = 0;
 		serialWriteStr("shift off\n");
 		return; 
-	} else if(scancode & 0x80) { 
+	}
+	if(scancode & 0x80) { 
 		return; 
 	}
 
@@ -131,12 +132,12 @@ void handleScancode(uint8_t scancode) {
 		c = scancodeLUT[scancode];
 	}
 
-	if(c < ' ' || c > '~') { return; }
+	if(c != '\n' && c < ' ' || c > '~') { return; }
 
 	keyboardStr[i] = c;
 
 	++i;
-	if(i >= 32) { i = 0; }
+	if(i >= 256) { i = 0; }
 
 	return;
 }

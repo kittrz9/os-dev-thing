@@ -5,6 +5,6 @@
 
 void handleScancode(uint8_t scanecode);
 
-extern char keyboardStr[32];
+extern char keyboardStr[256];
 
 #endif
