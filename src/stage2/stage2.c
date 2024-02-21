@@ -3,16 +3,16 @@
 #include "screen.h"
 #include "pic.h"
 #include "timer.h"
-#include "funny.h"
+#include "text.h"
 
 void loadIDT(void);
 
 void stage2(void) {
 	initSerial();
 
-	struct vbe_mode_info_structure* vbeInfo = (struct vbe_mode_info_structure*)0x1000;
+	vbeInfo = *(struct vbe_mode_info_structure*)0x1000;
 
-	uint8_t* fbPtr = vbeInfo->framebuffer;
+	uint8_t* fbPtr = (uint8_t*)vbeInfo.framebuffer;
 
 	serialWriteStr("waga baba bobo\n");
 	serialWriteHex32(0xbee5bee5);
@@ -44,7 +44,7 @@ void stage2(void) {
 		uint8_t g = (color&0xff00)>>8;
 		uint8_t r = (color&0xff0000)>>16;
 		uint8_t* ptr = fbPtr;
-		uint16_t pitch = vbeInfo->pitch;
+		uint16_t pitch = vbeInfo.pitch;
 		for(uint16_t line = 0; line < 480; ++line) {
 			for(uint16_t i = 0; i < 640*3; i+=3) {
 				*(ptr+i) = b;
@@ -55,18 +55,7 @@ void stage2(void) {
 		}
 		++hue;
 
-		ptr = fbPtr;
-		for(uint16_t i = 0; i < funnyW*funnyH; ++i) {
-			if(i != 0 && i%funnyW == 0) {
-				ptr += pitch-((funnyW-1)*3)-3;
-			}
-			uint8_t v = funny[i];
-			*(ptr) = v;
-			*(ptr+1) = v;
-			*(ptr+2) = v;
-
-			ptr += 3;
-		}
+		drawStr("https://kittrz.gay/\n\nwaga baba bobo\n\nbasic text rendering!!!!!",0,0);
 
 		sleep(20);
 

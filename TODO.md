@@ -1,7 +1,6 @@
 # things I need to do
  - implement parts of the c standard library like memcpy
- - double buffer the display
- - text rendering
+ - double buffer the display so the text isn't always flickering
  - figure out what I'm going to actually do with the kernel part if I ever actually get to that
 
 <hr>

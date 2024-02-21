@@ -30,11 +30,11 @@ def main():
 	print("#include <stdint.h>")
 
 
-	print(f"uint8_t {name}W = {img.size[0]};")
-	print(f"uint8_t {name}H = {img.size[1]};")
+	print(f"uint16_t {name}W = {img.size[0]};")
+	print(f"uint16_t {name}H = {img.size[1]};")
 
 
-	print(f"static const char {name}[] = {{")
+	print(f"static const uint8_t {name}[] = {{")
 	for y in range(img.size[1]):
 		print("\t", end='')
 		for x in range(img.size[0]):

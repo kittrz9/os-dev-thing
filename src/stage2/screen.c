@@ -1,5 +1,7 @@
 #include "screen.h"
 
+struct vbe_mode_info_structure vbeInfo;
+
 // maximum saturation and value
 uint32_t hueToRgb(uint8_t hue) {
 	// https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
