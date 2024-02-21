@@ -3,6 +3,7 @@
 #include "screen.h"
 #include "pic.h"
 #include "timer.h"
+#include "funny.h"
 
 void loadIDT(void);
 
@@ -45,14 +46,27 @@ void stage2(void) {
 		uint8_t* ptr = fbPtr;
 		uint16_t pitch = vbeInfo->pitch;
 		for(uint16_t line = 0; line < 480; ++line) {
-			ptr += pitch;
 			for(uint16_t i = 0; i < 640*3; i+=3) {
 				*(ptr+i) = b;
 				*(ptr+i+1) = g;
 				*(ptr+i+2) = r;
 			}
+			ptr += pitch;
 		}
 		++hue;
+
+		ptr = fbPtr;
+		for(uint16_t i = 0; i < funnyW*funnyH; ++i) {
+			if(i != 0 && i%funnyW == 0) {
+				ptr += pitch-((funnyW-1)*3)-3;
+			}
+			uint8_t v = funny[i];
+			*(ptr) = v;
+			*(ptr+1) = v;
+			*(ptr+2) = v;
+
+			ptr += 3;
+		}
 
 		sleep(20);
 

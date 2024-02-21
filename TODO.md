@@ -1,6 +1,8 @@
 # things I need to do
- - load kernel
-	- maybe on the second partition?
+ - implement parts of the c standard library like memcpy
+ - double buffer the display
+ - text rendering
+ - figure out what I'm going to actually do with the kernel part if I ever actually get to that
 
 <hr>
 
