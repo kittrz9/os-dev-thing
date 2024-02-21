@@ -58,7 +58,7 @@ void stage2(void) {
 		refreshScreen();
 
 		// double buffering the screen takes so much time that it doesn't need to sleep
-		//sleep(10);
+		sleep(10);
 
 	}
 

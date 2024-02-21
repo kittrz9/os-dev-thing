@@ -2,7 +2,6 @@
  - implement parts of the c standard library like memcpy
  - figure out memory management stuff
  - get a better fix to the weird framebuffer collision issue mentioned in `src/stage2/screen.c`
- - speed up the double buffering stuff
  - figure out what I'm going to actually do with the kernel part if I ever actually get to that
 
 <hr>

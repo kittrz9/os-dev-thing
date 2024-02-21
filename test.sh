@@ -3,6 +3,7 @@
 set -xe
 
 qemu-system-i386 \
+	-enable-kvm \
 	-chardev stdio,id=char0,mux=on,signal=off \
 	-serial chardev:char0 \
 	-s \
