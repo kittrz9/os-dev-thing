@@ -50,14 +50,6 @@ void drawFilledRect(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint32_t c
 
 	while(y < y2) {
 		while(x < x2) {
-			if(ptr+2 > backBuffer + 640*480*3) {
-				serialWriteStr("backbuffer overflow\n");
-				serialWriteStr("x: ");
-				serialWriteHex32(x);
-				serialWriteStr("y: ");
-				serialWriteHex32(y);
-				asm volatile("cli;hlt;");
-			}
 			*(ptr) = b;
 			*(ptr+1) = g;
 			*(ptr+2) = r;
