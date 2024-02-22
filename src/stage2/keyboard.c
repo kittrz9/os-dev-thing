@@ -1,8 +1,8 @@
 #include "keyboard.h"
 #include "serial.h"
 #include "text.h"
+#include "term.h"
 
-char keyboardStr[256];
 uint8_t shift = 0;
 
 char scancodeLUT[] = {
@@ -19,6 +19,7 @@ char scancodeLUT[] = {
 	[0x0b] = '0',
 	[0x0c] = '-',
 	[0x0d] = '=',
+	[0x0e] = '\b',
 	[0x10] = 'q',
 	[0x11] = 'w',
 	[0x12] = 'e',
@@ -68,6 +69,7 @@ char shiftScancodeLUT[] = {
 	[0x0b] = ')',
 	[0x0c] = '_',
 	[0x0d] = '+',
+	[0x0e] = '\b',
 	[0x10] = 'Q',
 	[0x11] = 'W',
 	[0x12] = 'E',
@@ -106,25 +108,24 @@ char shiftScancodeLUT[] = {
 };
 
 void handleScancode(uint8_t scancode) {
-	serialWriteStr("scancode: ");
-	serialWriteHex32(scancode);
+	static uint8_t i = 0;
+	char c;
+
+	/*serialWriteStr("scancode: ");
+	serialWriteHex32(scancode);*/
 	if(scancode == 0x36 || scancode == 0x2a) { 
 		shift = 1;
-		serialWriteStr("shift on\n");
+		//serialWriteStr("shift on\n");
 		return; 
 	}
 	if(scancode == 0xb6 || scancode == 0xaa) {
 		shift = 0;
-		serialWriteStr("shift off\n");
+		//serialWriteStr("shift off\n");
 		return; 
 	}
 	if(scancode & 0x80) { 
 		return; 
 	}
-
-	static uint8_t i = 0;
-
-	char c;
 
 	if(shift) {
 		c = shiftScancodeLUT[scancode];
@@ -132,12 +133,13 @@ void handleScancode(uint8_t scancode) {
 		c = scancodeLUT[scancode];
 	}
 
-	if(c != '\n' && c < ' ' || c > '~') { return; }
+	if(c != '\n' && c != '\b' && c < ' ' || c > '~') { return; }
 
-	keyboardStr[i] = c;
+	//keyboardStr[i] = c;
+	putc(c);
 
-	++i;
-	if(i >= 256) { i = 0; }
+	/*++i;
+	if(i >= 256) { i = 0; }*/
 
 	return;
 }

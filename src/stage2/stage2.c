@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "text.h"
 #include "keyboard.h"
+#include "term.h"
 
 void loadIDT(void);
 
@@ -35,6 +36,10 @@ void stage2(void) {
 		outb(0x61, tmp | 3);
 	}*/
 
+	initTerm();
+
+	puts("https://kittrz.gay/\n");
+
 	uint8_t hue = 0;
 	while(1) {
 		uint32_t color = hueToRgb(hue);
@@ -54,13 +59,11 @@ void stage2(void) {
 		}
 		++hue;
 
-		drawStr("https://kittrz.gay/\n\nwaga baba bobo\n\nbasic text rendering!!!!!",0,0);
-		drawStr(keyboardStr,0,100);
+		drawTerm();
 
 		refreshScreen();
 
-		// double buffering the screen takes so much time that it doesn't need to sleep
-		sleep(10);
+		sleep(20);
 
 	}
 
