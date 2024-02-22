@@ -31,6 +31,9 @@ void putc(char c) {
 		term[cursor] = ' ';
 		return;
 	}
+	if(c == '\t') {
+		cursor += 4;
+	}
 
 	if(cursor > 80*30-1) {
 		for(uint16_t i = 0; i < 80*29; ++i) {

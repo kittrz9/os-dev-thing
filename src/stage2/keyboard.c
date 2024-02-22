@@ -6,7 +6,7 @@
 uint8_t shift = 0;
 
 char scancodeLUT[] = {
-	[0x01] = '`',
+	[0x01] = '\0',
 	[0x02] = '1',
 	[0x03] = '2',
 	[0x04] = '3',
@@ -20,6 +20,7 @@ char scancodeLUT[] = {
 	[0x0c] = '-',
 	[0x0d] = '=',
 	[0x0e] = '\b',
+	[0x0f] = '\t',
 	[0x10] = 'q',
 	[0x11] = 'w',
 	[0x12] = 'e',
@@ -44,6 +45,9 @@ char scancodeLUT[] = {
 	[0x26] = 'l',
 	[0x27] = ';',
 	[0x28] = '\'',
+	[0x29] = '`',
+	[0x2a] = '\0',
+	[0x2b] = '\\',
 	[0x2c] = 'z',
 	[0x2d] = 'x',
 	[0x2e] = 'c',
@@ -57,6 +61,7 @@ char scancodeLUT[] = {
 	[0x39] = ' ',
 };
 char shiftScancodeLUT[] = {
+	[0x01] = '\0',
 	[0x02] = '!',
 	[0x03] = '@',
 	[0x04] = '#',
@@ -70,6 +75,7 @@ char shiftScancodeLUT[] = {
 	[0x0c] = '_',
 	[0x0d] = '+',
 	[0x0e] = '\b',
+	[0x0f] = '\t',
 	[0x10] = 'Q',
 	[0x11] = 'W',
 	[0x12] = 'E',
@@ -94,6 +100,9 @@ char shiftScancodeLUT[] = {
 	[0x26] = 'L',
 	[0x27] = ':',
 	[0x28] = '"',
+	[0x29] = '~',
+	[0x2a] = '\0',
+	[0x2b] = '|',
 	[0x2c] = 'Z',
 	[0x2d] = 'X',
 	[0x2e] = 'C',
@@ -108,7 +117,6 @@ char shiftScancodeLUT[] = {
 };
 
 void handleScancode(uint8_t scancode) {
-	static uint8_t i = 0;
 	char c;
 
 	/*serialWriteStr("scancode: ");
@@ -133,7 +141,7 @@ void handleScancode(uint8_t scancode) {
 		c = scancodeLUT[scancode];
 	}
 
-	if(c != '\n' && c != '\b' && c < ' ' || c > '~') { return; }
+	if(c != '\n' && c != '\b' && c != '\t' && (c < ' ' || c > '~')) { return; }
 
 	//keyboardStr[i] = c;
 	putc(c);
