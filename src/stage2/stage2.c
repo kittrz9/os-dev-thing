@@ -9,10 +9,13 @@
 
 void loadIDT(void);
 
-void stage2(void) {
+void stage2(struct vbe_mode_info_structure* vbePtr) {
 	initSerial();
 
-	vbeInfo = *(struct vbe_mode_info_structure*)0x1000;
+	vbeInfo = *vbePtr;
+
+	serialWriteStr("stage 2 loaded at: ");
+	serialWriteHex32((uint32_t)stage2);
 
 	serialWriteStr("waga baba bobo\n");
 	serialWriteHex32(0xbee5bee5);

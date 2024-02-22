@@ -1,6 +1,8 @@
 #include "term.h"
 #include <stdint.h>
 #include "serial.h"
+#include "screen.h"
+#include "text.h"
 
 char term[80*30];
 uint16_t cursor = 0;
@@ -19,6 +21,19 @@ void drawTerm(void) {
 	uint16_t cursorX = (cursor%80) * 8;
 	uint16_t cursorY = (cursor/80) * 16;
 	drawFilledRect(cursorX, cursorY, cursorX+8, cursorY+16, 0xffffff);
+}
+
+void cursorBoundsCheck(void) {
+	if(cursor > 80*30-1) {
+		for(uint16_t i = 0; i < 80*29; ++i) {
+			term[i] = term[i+80];
+		}
+		for(uint16_t i = 80*29; i < 80*30; ++i) {
+			term[i] = ' ';
+		}
+
+		cursor = 29*80;
+	}
 }
 
 // maybe should change these names later
@@ -41,21 +56,11 @@ void putc(char c) {
 		cursor += 4;
 	}
 
-	if(cursor > 80*30-1) {
-		for(uint16_t i = 0; i < 80*29; ++i) {
-			term[i] = term[i+80];
-		}
-		for(uint16_t i = 80*29; i < 80*30; ++i) {
-			term[i] = ' ';
-		}
-
-		cursor = 29*80;
-	}
-
 	if(c >= ' ' && c <= '~') {
 		term[cursor] = c;
 		++cursor;
 	}
+	cursorBoundsCheck();
 }
 
 void puts(char* str) {

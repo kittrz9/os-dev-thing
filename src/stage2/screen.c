@@ -12,7 +12,7 @@ memory layout
 this will need to be changed as soon as I actually start to figure out actual
 memory management
 */
-uint8_t* backBuffer = (uint8_t*)0x100000;
+uint8_t backBuffer[640*480*3];
 
 // maximum saturation and value
 uint32_t hueToRgb(uint8_t hue) {
@@ -48,8 +48,16 @@ void drawFilledRect(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint32_t c
 	uint8_t g = (color&0xff00)>>8;
 	uint8_t r = (color&0xff0000)>>16;
 
-	while(y <= y2) {
-		while(x <= x2) {
+	while(y < y2) {
+		while(x < x2) {
+			if(ptr+2 > backBuffer + 640*480*3) {
+				serialWriteStr("backbuffer overflow\n");
+				serialWriteStr("x: ");
+				serialWriteHex32(x);
+				serialWriteStr("y: ");
+				serialWriteHex32(y);
+				asm volatile("cli;hlt;");
+			}
 			*(ptr) = b;
 			*(ptr+1) = g;
 			*(ptr+2) = r;
@@ -59,6 +67,6 @@ void drawFilledRect(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint32_t c
 		}
 		++y;
 		x = startX;
-		ptr += pitch-((x2-x)*3)-3;
+		ptr += pitch-((x2-x)*3);
 	}
 }
