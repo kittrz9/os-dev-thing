@@ -48,6 +48,7 @@ struct vbe_mode_info_structure {
 extern struct vbe_mode_info_structure vbeInfo;
 extern uint8_t* backBuffer;
 
+void drawFilledRect(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint32_t color);
 void refreshScreen();
 
 #endif

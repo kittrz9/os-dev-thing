@@ -16,6 +16,9 @@ void drawTerm(void) {
 			drawChar(term[y*80 + x], x*8,y*16);
 		}
 	}
+	uint16_t cursorX = (cursor%80) * 8;
+	uint16_t cursorY = (cursor/80) * 16;
+	drawFilledRect(cursorX, cursorY, cursorX+8, cursorY+16, 0xffffff);
 }
 
 // maybe should change these names later
