@@ -28,9 +28,12 @@ void putc(char c) {
 		cursor -= cursor%80;
 	}
 	if(c == '\b' && cursor != 0) {
-		do {
-			--cursor;
-		}while(term[cursor] == ' ');
+		--cursor;
+		if(cursor%80 == 79) {
+			while(term[cursor] == ' ' && cursor%80 != 0){
+				--cursor;
+			};
+		}
 		term[cursor] = ' ';
 		return;
 	}
