@@ -6,6 +6,7 @@
 #include "text.h"
 #include "keyboard.h"
 #include "term.h"
+#include "ata.h"
 
 void loadIDT(void);
 
@@ -42,6 +43,28 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 	initTerm();
 
 	puts("https://kittrz.gay/\n");
+
+	if(!initATA()) {
+		uint8_t test[1024];
+		readATA(0, 2, test);
+		puts("\nsector 0: \n");
+		for(uint16_t i = 0; i < 512; ++i) {
+			if(test[i] >= ' ' && test[i] <= '~') {
+				putc(test[i]);
+			} else {
+				putc('.');
+			}
+		}
+		puts("\nsector 1: \n");
+		for(uint16_t i = 512; i < 1024; ++i) {
+			if(test[i] >= ' ' && test[i] <= '~') {
+				putc(test[i]);
+			} else {
+				putc('.');
+			}
+		}
+		puts("\n\nrun something like `xxd build/os.bin` on the host machine to verify please\n");
+	}
 
 	uint8_t hue = 0;
 	while(1) {

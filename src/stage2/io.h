@@ -15,6 +15,12 @@ static inline uint8_t inb(uint16_t port) {
 	return ret;
 }
 
+static inline uint16_t inw(uint16_t port) {
+	uint16_t ret;
+	__asm__ volatile ("inw %1, %0" : "=a"(ret) : "Nd"(port) : "memory");
+	return ret;
+}
+
 static inline void ioWait(void) {
 	outb(0x80, 0);
 }
