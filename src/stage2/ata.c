@@ -1,6 +1,7 @@
 #include "ata.h"
 #include "io.h"
 #include "serial.h"
+#include "term.h"
 
 // https://wiki.osdev.org/ATA_PIO_Mode
 
@@ -36,6 +37,8 @@ uint8_t pollATA(void) {
 	return 0;
 }
 
+uint8_t ataInitialized = 1;
+
 uint8_t initATA(void) {
 	outb(ATA_DRIVE, 0xe0);
 	outb(ATA_SECTOR_COUNT, 0x00);
@@ -47,6 +50,7 @@ uint8_t initATA(void) {
 	uint8_t status = inb(ATA_STATUS);
 	if(status == 0) {
 		serialWriteStr("main drive not found\n");
+		ataInitialized = 0;
 		return 1;
 	}
 	pollATA();
@@ -59,6 +63,11 @@ uint8_t initATA(void) {
 }
 
 uint8_t readATA(uint32_t lba, uint8_t count, uint16_t* buf) {
+	if(!ataInitialized) {
+		puts("ata not initialized\n");
+		return 1;
+	}
+	
 	if(lba > 0x0fffffff) { 
 		serialWriteStr("lba too big: ");
 		serialWriteHex32(lba);

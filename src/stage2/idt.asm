@@ -21,7 +21,7 @@ idt:
 idtEnd:
 
 section .rodata
-str:
+interruptStr:
 	db "interrupt hit!!!!", 0xa, 0x0
 
 extern serialWriteStr
@@ -30,7 +30,7 @@ align 4
 interruptHandler:
 	pushad
 	sub esp, 4
-	lea eax, str
+	lea eax, interruptStr
 	mov [esp], eax
 	call serialWriteStr
 	; acknowledge to PIC

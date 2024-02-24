@@ -4,6 +4,7 @@
 #include "ata.h"
 #include "term.h"
 #include "mbr.h"
+#include "serial.h"
 
 // https://wiki.osdev.org/USTAR
 
@@ -55,13 +56,35 @@ char* hex32Str(uint32_t n) {
 
 	return str;
 }
-void listFiles(void) {
+
+// having these get put into bss made them unitialized, I should probably init bss to 0 myself but whatever this works for now
+__attribute__((section("data"))) uint32_t fsSize = 0;
+__attribute__((section("data"))) uint32_t fsLBA = 0;
+
+void initFS(void) {
 	uint8_t buffer[512];
 	readATA(0, 1, (uint16_t*)buffer);
 	mbrPartition* fsPart = (mbrPartition*)(buffer+PARTITION2_OFFSET);
 
-	uint32_t fsSize = fsPart->size;
-	uint32_t fsLBA = fsPart->lba;
+	fsSize = fsPart->size;
+	fsLBA = fsPart->lba;
+	readATA(fsLBA, 1, (uint16_t*)buffer);
+	ustarHeader* header = (ustarHeader*)buffer;
+	if(memcmp(header->ustarStr, "ustar", 5) != 0) {
+		fsSize = 0;
+		fsLBA = 0;
+		puts("invalid filesystem\n");
+	}
+}
+
+void listFiles(void) {
+	uint8_t buffer[512];
+
+	if(fsSize == 0 || fsLBA == 0) {
+		puts("file system not initialized or invalid\n");
+		return;
+	}
+
 	puts("files: \n");
 
 	for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
@@ -84,11 +107,12 @@ extern uint32_t stage2End;
 
 void printFile(char* name) {
 	uint8_t buffer[512];
-	readATA(0, 1, (uint16_t*)buffer);
-	mbrPartition* fsPart = (mbrPartition*)(buffer+PARTITION2_OFFSET);
 
-	uint32_t fsSize = fsPart->size;
-	uint32_t fsLBA = fsPart->lba;
+	if(fsSize == 0) {
+		puts("file system not initialized or invalid\n");
+		return;
+	}
+
 	for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
 		readATA(i, 1, (uint16_t*)buffer);
 		ustarHeader* header = (ustarHeader*)buffer;
@@ -105,6 +129,4 @@ void printFile(char* name) {
 	puts("file not found\n");
 	return;
 }
-
-
 
