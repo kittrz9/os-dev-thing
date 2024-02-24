@@ -7,6 +7,7 @@
 #include "keyboard.h"
 #include "term.h"
 #include "ata.h"
+#include "fs.h"
 
 void loadIDT(void);
 
@@ -45,7 +46,7 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 	puts("https://kittrz.gay/\n");
 
 	if(!initATA()) {
-		uint8_t test[1024];
+		/*uint8_t test[1024];
 		readATA(0, 2, test);
 		puts("\nsector 0: \n");
 		for(uint16_t i = 0; i < 512; ++i) {
@@ -63,7 +64,8 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 				putc('.');
 			}
 		}
-		puts("\n\nrun something like `xxd build/os.bin` on the host machine to verify please\n");
+		puts("\n\nrun something like `xxd build/os.bin` on the host machine to verify please\n");*/
+		listFiles();
 	}
 
 	uint8_t hue = 0;

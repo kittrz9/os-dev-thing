@@ -1,4 +1,4 @@
-# ground up os dev thing
+# from the ground up os dev thing
 this is probably my like the 20th attempt at x86 shit, at this point I'm tired of trying to deal with everything past like protected mode.<br>
 <br>
 hopefully doing stuff from the MBR and real mode up will finally allow me to actually learn this stuff<br>

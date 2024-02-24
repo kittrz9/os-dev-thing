@@ -1,7 +1,8 @@
 # things I need to do
- - implement parts of the c standard library like memcpy
+ - implement the rest of string.h
  - figure out memory management stuff
- - set up filesystem stuff (probably USTAR) and load kernel from that
+ - figure out paging stuff
+ - read from the file system and load the kernel from that
  - move keyboard and terminal stuff into the kernel instead of stage2 once I actually start working on that
  - move files that will be used in the kernel and stage2 into their own directory
  - implement ATA writing
