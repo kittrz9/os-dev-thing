@@ -5,19 +5,20 @@ ENTRY(stage2)
 SECTIONS {
 	. = 0xc0000;
 	.text : {
-		*(.entry)
-		*(.text)
+		*(.entry);
+		*(.text);
 	}
 
 	.rodata : {
-		*(.rodata)
+		*(.rodata);
 	}
 
 	.data : {
-		*(.data)
+		*(.data);
 	}
 	.bss : {
-		*(.bss)
+		*(.bss);
 	}
+	stage2End = .;
 }
 

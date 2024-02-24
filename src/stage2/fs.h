@@ -3,4 +3,6 @@
 
 void listFiles(void);
 
+void printFile(char* name);
+
 #endif

@@ -11,6 +11,8 @@
 
 void loadIDT(void);
 
+extern uint32_t stage2End;
+
 void stage2(struct vbe_mode_info_structure* vbePtr) {
 	initSerial();
 
@@ -19,8 +21,11 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 	serialWriteStr("stage 2 loaded at: ");
 	serialWriteHex32((uint32_t)stage2);
 
-	serialWriteStr("waga baba bobo\n");
-	serialWriteHex32(0xbee5bee5);
+	//serialWriteStr("waga baba bobo\n");
+	//serialWriteHex32(0xbee5bee5);
+
+	serialWriteStr("stage 2 end: ");
+	serialWriteHex32((uint32_t)&stage2End);
 
 	loadIDT();
 
@@ -66,6 +71,8 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 		}
 		puts("\n\nrun something like `xxd build/os.bin` on the host machine to verify please\n");*/
 		listFiles();
+		puts("reading TODO.md\n\n");
+		printFile("TODO.md");
 	}
 
 	uint8_t hue = 0;

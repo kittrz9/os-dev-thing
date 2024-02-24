@@ -77,3 +77,34 @@ void listFiles(void) {
 
 	return;
 }
+
+// just dumping everything at the end of stage2 in ram
+// really need to make some allocator eventually
+extern uint32_t stage2End;
+
+void printFile(char* name) {
+	uint8_t buffer[512];
+	readATA(0, 1, (uint16_t*)buffer);
+	mbrPartition* fsPart = (mbrPartition*)(buffer+PARTITION2_OFFSET);
+
+	uint32_t fsSize = fsPart->size;
+	uint32_t fsLBA = fsPart->lba;
+	for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
+		readATA(i, 1, (uint16_t*)buffer);
+		ustarHeader* header = (ustarHeader*)buffer;
+		if(memcmp(header->ustarStr, "ustar", 5) == 0) {
+			if(strcmp(header->name, name) == 0) {
+				uint32_t fileSize = parseOctStr(header->size);
+				readATA(i+1, fileSize/512 + (fileSize%512!=0), (uint16_t*)&stage2End);
+				puts((char*)&stage2End);
+				return;
+			}
+		}
+	}
+
+	puts("file not found\n");
+	return;
+}
+
+
+
