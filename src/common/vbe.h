@@ -1,9 +1,7 @@
-#ifndef SCREEN_H
-#define SCREEN_H
+#ifndef VBE_H
+#define VBE_H
 
 #include <stdint.h>
-
-uint32_t hueToRgb(uint8_t hue);
 
 // literally just copied and pasted from osdev wiki
 // https://wiki.osdev.org/Getting_VBE_Mode_Info#VESA_Functions
@@ -46,9 +44,5 @@ struct vbe_mode_info_structure {
 } __attribute__ ((packed));
 
 extern struct vbe_mode_info_structure vbeInfo;
-extern uint8_t backBuffer[640*480*3];
-
-void drawFilledRect(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint32_t color);
-void refreshScreen();
 
 #endif

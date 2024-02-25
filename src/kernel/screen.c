@@ -1,17 +1,6 @@
 #include "screen.h"
-#include "serial.h"
+#include "vbe.h"
 
-struct vbe_mode_info_structure vbeInfo;
-
-/*
-really stupid workaround to make the back buffer not collide with 0xA0000,
-which for some reason still reads from the framebuffer even though I'm not
-using any VGA or VESA mode that would actually make sense with that strange
-memory layout
-
-this will need to be changed as soon as I actually start to figure out actual
-memory management
-*/
 uint8_t backBuffer[640*480*3];
 
 // maximum saturation and value

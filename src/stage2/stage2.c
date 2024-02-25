@@ -1,6 +1,6 @@
 #include "serial.h"
 #include "io.h"
-#include "screen.h"
+#include "vbe.h"
 #include "ata.h"
 #include "fs.h"
 

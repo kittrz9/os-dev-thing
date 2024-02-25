@@ -13,10 +13,14 @@ void loadIDT(void);
 
 void kernel(struct vbe_mode_info_structure* vbePtr) {
 	vbeInfo = *vbePtr;
-	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
 	initSerial();
 
+	serialWriteStr("kernel loaded at: ");
+	serialWriteHex32(kernel);
+	serialWriteStr("\n");
+
+	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
 	vbeInfo = *vbePtr;
 
