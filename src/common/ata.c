@@ -1,7 +1,6 @@
 #include "ata.h"
 #include "io.h"
 #include "serial.h"
-#include "term.h"
 
 // https://wiki.osdev.org/ATA_PIO_Mode
 
@@ -64,7 +63,7 @@ uint8_t initATA(void) {
 
 uint8_t readATA(uint32_t lba, uint8_t count, uint16_t* buf) {
 	if(!ataInitialized) {
-		puts("ata not initialized\n");
+		serialWriteStr("ata not initialized\n");
 		return 1;
 	}
 	

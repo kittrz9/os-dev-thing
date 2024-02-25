@@ -1,9 +1,9 @@
 OUTPUT_FORMAT("elf32-i386")
 
-ENTRY(stage2)
+ENTRY(kernel)
 
 SECTIONS {
-	. = 0xc0000;
+	. = 0x100000;
 	.text : {
 		*(.entry);
 		*(.text);
@@ -19,9 +19,7 @@ SECTIONS {
 	.bss : {
 		*(.bss);
 	}
-	stage2End = .;
 	endPage = ALIGN(4K);
-
 	/DISCARD/ : {
 		*(.debug_info)
 		*(.debug_abbrev)

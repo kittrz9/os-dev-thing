@@ -1,6 +1,7 @@
 #include "serial.h"
 
 #include "io.h"
+#include "string.h"
 
 // https://wiki.osdev.org/Serial_Ports#Example_Code
 
@@ -57,9 +58,10 @@ void serialWriteStr(char* str) {
 	return;
 }
 
-void serialWriteHex32(uint32_t n) {
+char* hex32Str(uint32_t n) {
 	char hexLUT[] = "0123456789ABCDEF";
-	char str[] = "0x00000000\n";
+	static char str[11];
+	strcpy(str, "0x00000000");
 
 	char* ptr = str + 8;
 	while(n != 0) {
@@ -69,7 +71,12 @@ void serialWriteHex32(uint32_t n) {
 		ptr -= 2;
 	}
 
-	serialWriteStr(str);
+	return str;
+}
+
+
+void serialWriteHex32(uint32_t n) {
+	serialWriteStr(hex32Str(n));
 	
 	return;
 }

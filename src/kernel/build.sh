@@ -4,7 +4,7 @@ cd "$ORIGIN_DIR"
 
 OBJS="$(find obj/common/ -type f)"
 
-CFILES="$(find src/stage2/ -name "*.c")"
+CFILES="$(find src/kernel/ -name "*.c")"
 for f in $CFILES; do
 	OBJNAME="$(echo "$f" | sed -e "s/\.c/\.o/" -e "s/src/obj/")"
 	echo "obj $OBJNAME"
@@ -14,12 +14,12 @@ for f in $CFILES; do
 		mkdir -p "$OBJDIR"
 	fi
 
-	$CC $CFLAGS $DEFINES -D STAGE2 $INCLUDES -o "$OBJNAME" -c "$f"
+	$CC $CFLAGS $DEFINES -D KERNEL $INCLUDES -o "$OBJNAME" -c "$f"
 
 	OBJS="$OBJNAME $OBJS"
 done
 
-ASMFILES="$(find src/stage2/ -name "*.asm")"
+ASMFILES="$(find src/kernel/ -name "*.asm")"
 for f in $ASMFILES; do
 	OBJNAME="$(echo "$f" | sed -e "s/\.asm/\.o/" -e "s/src/obj/")"
 	echo "obj $OBJNAME"
@@ -37,6 +37,6 @@ done
 
 echo $OBJS
 
-$LD $OBJS $LDFLAGS -T src/stage2/linker.ld -o build/stage2.elf
-$OBJCOPY -O binary build/stage2.elf build/stage2.bin
+$LD $OBJS $LDFLAGS -T src/kernel/linker.ld -o build/kernel.elf
+$OBJCOPY -O binary build/kernel.elf build/kernel.bin
 

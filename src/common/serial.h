@@ -23,4 +23,8 @@ void serialWriteChar(char c);
 void serialWriteStr(char* str);
 void serialWriteHex32(uint32_t n);
 
+// should really be moved somewhere else but this works for now
+char* hex32Str(uint32_t n); 
+
+
 #endif
