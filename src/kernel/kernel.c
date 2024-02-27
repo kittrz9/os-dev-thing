@@ -11,9 +11,7 @@
 
 void loadIDT(void);
 
-void kernel(struct vbe_mode_info_structure* vbePtr) {
-	vbeInfo = *vbePtr;
-
+void kernel() {
 	initSerial();
 
 	serialWriteStr("kernel loaded at: ");
@@ -22,7 +20,6 @@ void kernel(struct vbe_mode_info_structure* vbePtr) {
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
-	vbeInfo = *vbePtr;
 
 	PICInit();
 

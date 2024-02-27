@@ -11,8 +11,6 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 	serialWriteHex32(stage2);
 	serialWriteStr("\n");
 
-	vbeInfo = *vbePtr;
-
 	if(!initATA()) {
 		initFS();
 		void (*kernelAddr)(struct vbe_mode_info_structure* vbeAddr) = 0x100000;
