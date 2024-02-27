@@ -15,7 +15,7 @@ void kernel() {
 	initSerial();
 
 	serialWriteStr("kernel loaded at: ");
-	serialWriteHex32(kernel);
+	serialWriteHex32((uint32_t)kernel);
 	serialWriteStr("\n");
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");

@@ -8,15 +8,17 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 	initSerial();
 
 	serialWriteStr("stage2 loaded at: ");
-	serialWriteHex32(stage2);
+	serialWriteHex32((uint32_t)stage2);
 	serialWriteStr("\n");
 
 	if(!initATA()) {
 		initFS();
-		void (*kernelAddr)(struct vbe_mode_info_structure* vbeAddr) = 0x100000;
+
+		// fixes warning about casting to a function pointer
+		typedef void kernelAddr_t(struct vbe_mode_info_structure*);
+		kernelAddr_t* kernelAddr = (kernelAddr_t*)0x100000;
 		readFile("kernel.bin", (uint8_t*)0x100000);
 		(*kernelAddr)(vbePtr);
-		while(1);
 	}
 
 	serialWriteStr("done\n");
