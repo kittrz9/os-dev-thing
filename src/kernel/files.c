@@ -4,17 +4,16 @@
 #include "ata.h"
 #include "string.h"
 #include "serial.h"
-
-// just dumping everything at the end of stage2 in ram
-// really need to make some allocator eventually
-extern uint32_t endPage;
+#include "pageAlloc.h"
 
 void printFile(char* name) {
-	if(readFile(name, (uint8_t*)&endPage)) {
-		puts((char*)&endPage);
+	uint8_t* buffer = pageAlloc(getFileSize(name)); // should probably not be traversing the file system twice here but whatever
+	if(readFile(name, buffer)) {
+		puts((char*)buffer);
 	} else {
 		puts("file not found\n");
 	}
+	// memory leak because I can't free pages yet lmao
 	return;
 }
 

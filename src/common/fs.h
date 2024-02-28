@@ -28,11 +28,9 @@ extern uint32_t fsLBA;
 
 void initFS(void);
 
-void listFiles(void);
-
 uint8_t readFile(char* name, uint8_t* dest);
 
-void printFile(char* name);
+uint32_t getFileSize(char* name);
 uint32_t parseOctStr(char* str);
 
 #endif

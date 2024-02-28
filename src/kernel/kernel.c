@@ -8,6 +8,7 @@
 #include "term.h"
 #include "ata.h"
 #include "fs.h"
+#include "files.h"
 
 void loadIDT(void);
 
@@ -40,7 +41,10 @@ void kernel() {
 		outb(0x61, tmp | 3);
 	}*/
 
+	initScreen();
 	initTerm();
+	serialWriteHex32((uint32_t)backBuffer);
+	serialWriteStr("\n");
 
 	puts("https://kittrz.gay/\n");
 

@@ -2,17 +2,15 @@
  - implement the rest of string.h
  - figure out memory management stuff
  - figure out paging stuff
- - make a page frame allocator (<https://wiki.osdev.org/Page_Frame_Allocation>)
- - figure out how to compile programs to be ran in the os
- - load kernel as an elf file rather than just raw bytes
- - make the kernel compatible with other bootloaders
+ - finish the page frame allocator (free pages and stuff)
+ - figure out why the stuff mentioned in src/kernel/screen.c works
  - implement ATA writing and write to the filesystem
+ - figure out how to compile programs to be ran in the os
+ - userspace stuff once all the above is finished
  - figure out what I'm going to actually do with the kernel (monolithic vs microkernel and stuff like that)
 
 <hr>
 
 # things that I don't really need to do but want to do eventually
- - get audio output
-	- maybe just pc beeper, though ideally would want something with PCM
-	- maybe AC97
  - UEFI booting
+ - make the kernel and bootloader compatible with multiboot

@@ -40,6 +40,29 @@ void initFS(void) {
 	}
 }
 
+uint32_t getFileSize(char* name) {
+	uint8_t buffer[512];
+
+	if(fsSize == 0) {
+		serialWriteStr("file system not initialized or invalid\n");
+		return 0;
+	}
+
+	for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
+		readATA(i, 1, (uint16_t*)buffer);
+		ustarHeader* header = (ustarHeader*)buffer;
+		if(memcmp(header->ustarStr, "ustar", 5) == 0) {
+			uint32_t fileSize = parseOctStr(header->size);
+			if(strcmp(header->name, name) == 0) {
+				return fileSize;
+			} else {
+				i += fileSize/512 + (fileSize%512!=0);
+			}
+		}
+	}
+	return 0;
+}
+
 uint8_t readFile(char* name, uint8_t* dest) {
 	uint8_t buffer[512];
 	if(fsSize == 0) {
@@ -51,10 +74,12 @@ uint8_t readFile(char* name, uint8_t* dest) {
 		readATA(i, 1, (uint16_t*)buffer);
 		ustarHeader* header = (ustarHeader*)buffer;
 		if(memcmp(header->ustarStr, "ustar", 5) == 0) {
+			uint32_t fileSize = parseOctStr(header->size);
 			if(strcmp(header->name, name) == 0) {
-				uint32_t fileSize = parseOctStr(header->size);
 				readATA(i+1, fileSize/512 + (fileSize%512!=0), (uint16_t*)dest);
 				return 1;
+			} else {
+				i += fileSize/512 + (fileSize%512!=0);
 			}
 		}
 	}

@@ -42,7 +42,7 @@ truncate build/stage2.bin -s "$(echo "$STAGE2_SIZE * 512" | bc)"
 mv build/kernel.bin ./
 
 # eventually make this its own folder with stuff in it
-tar -cvf build/fs.tar README.md LICENSE TODO.md kernel.bin -b 1
+tar -cvf build/fs.tar TODO.md kernel.bin -b 1
 FS_SIZE="$(python -c "import os; import math; a=os.path.getsize(\"build/fs.tar\");print(math.ceil(a/512))")"
 
 mv kernel.bin build/
