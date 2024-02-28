@@ -2,7 +2,7 @@
  - implement the rest of string.h
  - figure out memory management stuff
  - figure out paging stuff
- - finish the page frame allocator (free pages and stuff)
+ - update page frame allocator when paging is enabled
  - figure out why the stuff mentioned in src/kernel/screen.c works
  - implement ATA writing and write to the filesystem
  - figure out how to compile programs to be ran in the os

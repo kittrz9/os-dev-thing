@@ -13,7 +13,7 @@ void printFile(char* name) {
 	} else {
 		puts("file not found\n");
 	}
-	// memory leak because I can't free pages yet lmao
+	pageFree(buffer);
 	return;
 }
 

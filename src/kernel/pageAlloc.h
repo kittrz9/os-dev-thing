@@ -5,6 +5,7 @@
 
 void pageAllocInit();
 
-uint8_t* pageAlloc(uint32_t pageCount);
+void* pageAlloc(uint32_t pageCount);
+void pageFree(void* ptr);
 
 #endif

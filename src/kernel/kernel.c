@@ -9,6 +9,7 @@
 #include "ata.h"
 #include "fs.h"
 #include "files.h"
+#include "pageAlloc.h"
 
 void loadIDT(void);
 
@@ -21,6 +22,7 @@ void kernel() {
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
+	pageAllocInit();
 
 	PICInit();
 
@@ -43,8 +45,6 @@ void kernel() {
 
 	initScreen();
 	initTerm();
-	serialWriteHex32((uint32_t)backBuffer);
-	serialWriteStr("\n");
 
 	puts("https://kittrz.gay/\n");
 
