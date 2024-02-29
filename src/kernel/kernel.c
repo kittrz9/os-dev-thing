@@ -22,6 +22,8 @@ void kernel() {
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
+	asm volatile("cli;hlt");
+
 	pageAllocInit();
 
 	PICInit();

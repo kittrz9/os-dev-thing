@@ -3,20 +3,24 @@ OUTPUT_FORMAT("elf32-i386")
 ENTRY(kernel)
 
 SECTIONS {
+	/* https://wiki.osdev.org/Higher_Half_x86_Bare_Bones#linker.ld */
 	. = 0x100000;
-	.text : {
+	.entry : {
 		*(.entry);
+	}
+	. += 0x80000000;
+	.text ALIGN(4K) : AT(ADDR(.text) - 0x80000000) {
 		*(.text);
 	}
 
-	.rodata : {
+	.rodata ALIGN(4K) : AT(ADDR(.rodata) - 0x80000000) {
 		*(.rodata);
 	}
 
-	.data : {
+	.data ALIGN(4K) : AT(ADDR(.data) - 0x80000000) {
 		*(.data);
 	}
-	.bss : {
+	.bss ALIGN(4K) : AT(ADDR(.bss) - 0x80000000) {
 		*(.bss);
 	}
 	endPage = ALIGN(4K);
