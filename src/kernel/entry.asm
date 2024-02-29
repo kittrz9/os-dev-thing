@@ -71,6 +71,39 @@ fillPageTable:
 
 section .text
 testJmp:
+	; set up gdt again
+	lgdt [gdtr]
+
 	mov esp, stackTop
 	
 	jmp kernel
+
+
+; gdt copied from boot.asm
+; base high on both segments both changed to fit with the new virtual address
+section .data
+gdtr:
+	dw gdt-gdtEnd - 1 ; size
+	dd gdt ; address
+gdt:
+	dw 0; limit
+	dw 0; base low 2 bytes
+	db 0; base mid byte
+	db 0; access byte
+	db 0; flags + limit again
+	db 0; base high byte
+	; code segment
+	dw 0xffff; limit
+	dw 0x0000; base low 2 bytes
+	db 0x00; base mid byte
+	db 10011011b; access byte
+	db 11001111b ; flags + limit again
+	db 0x80; base high byte
+	; data segment
+	dw 0xffff; limit
+	dw 0x0000; base low 2 bytes
+	db 0x00; base mid byte
+	db 10010011b; access byte
+	db 11001111b ; flags + limit again
+	db 0x80; base high byte
+gdtEnd:

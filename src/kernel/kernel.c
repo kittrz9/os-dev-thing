@@ -22,8 +22,6 @@ void kernel() {
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
-	asm volatile("cli;hlt");
-
 	pageAllocInit();
 
 	PICInit();
@@ -44,6 +42,8 @@ void kernel() {
 	if(tmp != (tmp|3)){
 		outb(0x61, tmp | 3);
 	}*/
+
+	asm volatile("1: jmp 1b");
 
 	initScreen();
 	initTerm();
