@@ -43,6 +43,14 @@ void kernel() {
 		outb(0x61, tmp | 3);
 	}*/
 
+	serialWriteStr("framebuffer loaded at: ");
+	serialWriteHex32((uint32_t)vbeInfo.framebuffer);
+	serialWriteStr("\n");
+
+	*(uint32_t*)vbeInfo.framebuffer= 0x69420;
+	serialWriteHex32(*(uint32_t*)vbeInfo.framebuffer);
+	serialWriteStr("\n");
+
 	asm volatile("1: jmp 1b");
 
 	initScreen();

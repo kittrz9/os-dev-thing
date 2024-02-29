@@ -19,6 +19,8 @@ pageDir:
 	resb 0x1000
 pageTable:
 	resb 0x1000
+fbPageTable:
+	resb 0x1000
 vbeInfo:
 	resb 0x100
 stackBottom:
@@ -45,8 +47,13 @@ entry:
 	; and map that to 0x80000000
 	add edi, dirFromAddr(0x80000000)*4
 	mov dword[edi], eax
+	; map 0xF0000000 to the framebuffer page table
+	mov edi, virtToPhys(pageDir)+dirFromAddr(0xF0000000)*4
+	mov eax, virtToPhys(fbPageTable)
+	or eax, 3 ; present and r/w bit
+	mov dword[edi], eax
 
-	mov ecx, 0xf00
+	mov ecx, 0x1000
 	mov edi, 0x100000
 	add esi, tableFromAddr(0x100000)*4
 fillPageTable:
@@ -56,6 +63,30 @@ fillPageTable:
 	add edi, 0x1000
 	add esi, 4
 	loop fillPageTable
+
+
+	; I've mapped *something* to this memory region
+	; since I can write to it and read that back to confirm
+	; writing to it doesn't actually write to the framebuffer though
+	; most values in the tables seem to be correct after checking with gdb
+	; probably dumb segment shenanigans
+	; still commiting this since it's at least progress
+	mov ecx, 0x1000
+	mov edi, dword[virtToPhys(vbeInfo)+40] ; fb address is at this offset
+	mov ebx, edi
+	and edi, 0xFFFFF000 ; remove offset from the fb address
+	mov esi, virtToPhys(fbPageTable)
+fillFBPageTable:
+	mov eax, edi
+	or eax, 3 ; present and r/w bit
+	mov dword[esi], eax
+	add edi, 0x1000
+	add esi, 4
+	loop fillFBPageTable
+
+	and ebx, 0xFFF ; get rid of page dir bits
+	or ebx, 0xF0000000 ; and change it to this
+	mov dword[virtToPhys(vbeInfo)+40], ebx
 
 	; enable paging
 	mov eax, virtToPhys(pageDir)
@@ -75,12 +106,11 @@ testJmp:
 	lgdt [gdtr]
 
 	mov esp, stackTop
-	
+
 	jmp kernel
 
 
 ; gdt copied from boot.asm
-; base high on both segments both changed to fit with the new virtual address
 section .data
 gdtr:
 	dw gdt-gdtEnd - 1 ; size
@@ -98,12 +128,12 @@ gdt:
 	db 0x00; base mid byte
 	db 10011011b; access byte
 	db 11001111b ; flags + limit again
-	db 0x80; base high byte
+	db 0x00; base high byte
 	; data segment
 	dw 0xffff; limit
 	dw 0x0000; base low 2 bytes
 	db 0x00; base mid byte
 	db 10010011b; access byte
 	db 11001111b ; flags + limit again
-	db 0x80; base high byte
+	db 0x00; base high byte
 gdtEnd:
