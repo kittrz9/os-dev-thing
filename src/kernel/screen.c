@@ -5,11 +5,7 @@
 uint8_t* backBuffer;
 
 void initScreen() {
-	// I didn't realize this was working with only having 640*480*3 bytes until now.
-	// shouldn't pitch have been part of the calculation? shouldn't it have been clobbering nearby ram?
-	// same goes for the calculation in refreshScreen.
-	// idk maybe it is clobbering ram and I haven't noticed it. it should be clobbering vbeInfo according to objdump
-	backBuffer = pageAlloc(vbeInfo.height * vbeInfo.width * 3);
+	backBuffer = pageAlloc(vbeInfo.height * vbeInfo.pitch * 3);
 }
 
 // maximum saturation and value
@@ -33,8 +29,12 @@ uint32_t hueToRgb(uint8_t hue) {
 
 void refreshScreen() {
 	uint8_t* ptr = (uint8_t*)vbeInfo.framebuffer;
+	uint32_t bytesSkipped = vbeInfo.pitch - vbeInfo.width * 3;
 	for(uint32_t i = 0; i < vbeInfo.width * vbeInfo.height * 3; ++i) {
 		ptr[i] = backBuffer[i];
+		if(i != 0 && i % vbeInfo.width*3 == 0) {
+			i += bytesSkipped;
+		}
 	}
 }
 

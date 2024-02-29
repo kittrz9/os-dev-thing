@@ -3,7 +3,6 @@
  - figure out memory management stuff
  - figure out paging stuff
  - update page frame allocator when paging is enabled
- - figure out why the stuff mentioned in src/kernel/screen.c works
  - implement ATA writing and write to the filesystem
  - figure out how to compile programs to be ran in the os
  - userspace stuff once all the above is finished
