@@ -47,7 +47,7 @@ void kernel() {
 	serialWriteHex32((uint32_t)vbeInfo.framebuffer);
 	serialWriteStr("\n");
 
-	*(uint32_t*)vbeInfo.framebuffer= 0x69420;
+	*(uint32_t*)vbeInfo.framebuffer= 0xffffff;
 	serialWriteHex32(*(uint32_t*)vbeInfo.framebuffer);
 	serialWriteStr("\n");
 

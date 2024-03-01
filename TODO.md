@@ -1,7 +1,6 @@
 # things I need to do
  - implement the rest of string.h
  - figure out memory management stuff
- - map framebuffer to 0xF0000000
  - update page frame allocator when paging is enabled
  - implement ATA writing and write to the filesystem
  - figure out how to compile programs to be ran in the os

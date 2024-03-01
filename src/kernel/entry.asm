@@ -53,7 +53,7 @@ entry:
 	or eax, 3 ; present and r/w bit
 	mov dword[edi], eax
 
-	mov ecx, 0x1000
+	mov ecx, 0x400
 	mov edi, 0x100000
 	add esi, tableFromAddr(0x100000)*4
 fillPageTable:
@@ -64,14 +64,7 @@ fillPageTable:
 	add esi, 4
 	loop fillPageTable
 
-
-	; I've mapped *something* to this memory region
-	; since I can write to it and read that back to confirm
-	; writing to it doesn't actually write to the framebuffer though
-	; most values in the tables seem to be correct after checking with gdb
-	; probably dumb segment shenanigans
-	; still commiting this since it's at least progress
-	mov ecx, 0x1000
+	mov ecx, 0x400
 	mov edi, dword[virtToPhys(vbeInfo)+40] ; fb address is at this offset
 	mov ebx, edi
 	and edi, 0xFFFFF000 ; remove offset from the fb address
