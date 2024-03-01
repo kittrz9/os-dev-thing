@@ -119,9 +119,9 @@ char shiftScancodeLUT[] = {
 void handleScancode(uint8_t scancode) {
 	char c;
 
-	serialWriteStr("scancode: ");
+	/*serialWriteStr("scancode: ");
 	serialWriteHex32(scancode);
-	serialWriteStr("\n");
+	serialWriteStr("\n");*/
 	if(scancode == 0x36 || scancode == 0x2a) { 
 		shift = 1;
 		//serialWriteStr("shift on\n");

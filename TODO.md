@@ -1,7 +1,7 @@
 # things I need to do
  - implement the rest of string.h
  - figure out memory management stuff
- - update page frame allocator when paging is enabled
+ - update page frame allocator (currently works but will need to be changed when I inevitably run out of mapped pages)
  - implement ATA writing and write to the filesystem
  - figure out how to compile programs to be ran in the os
  - userspace stuff once all the above is finished
