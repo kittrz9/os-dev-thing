@@ -13,7 +13,7 @@
 
 void loadIDT(void);
 
-void kernel() {
+void kernel(void) {
 	initSerial();
 
 	serialWriteStr("kernel loaded at: ");

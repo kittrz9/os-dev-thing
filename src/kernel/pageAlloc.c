@@ -14,7 +14,7 @@ extern void* endPage;
 
 pageHeader* firstPage = (pageHeader*)&endPage; // endPage defined by linker
 
-void pageAllocInit() {
+void pageAllocInit(void) {
 	firstPage->next = NULL;
 	firstPage->used = 0;
 	firstPage->size = 0;
@@ -29,7 +29,7 @@ void* pageAlloc(uint32_t bytes) {
 		currentPage = currentPage->next;
 	}
 
-	currentPage->next = (uint32_t)(currentPage)+bytes+sizeof(pageHeader);
+	currentPage->next = (pageHeader*)((uint32_t)(currentPage)+bytes+sizeof(pageHeader));
 	// have to cast to an int so it doesn't do full pointer math
 	// the pageHeader* cast is so gcc doesn't throw a warning
 	currentPage->next = (pageHeader*)((uint32_t)(currentPage->next) + 0x1000 - ((uint32_t)(currentPage->next) & 0xFFF)); // align to 4k

@@ -37,6 +37,6 @@ done
 
 echo $OBJS
 
-$LD $OBJS $LDFLAGS -T src/stage2/linker.ld -o build/stage2.elf
+$LD $OBJS $LDFLAGS --script=src/stage2/linker.ld -o build/stage2.elf
 $OBJCOPY -O binary build/stage2.elf build/stage2.bin
 

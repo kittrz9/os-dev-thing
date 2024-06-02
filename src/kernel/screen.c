@@ -4,7 +4,7 @@
 
 uint8_t* backBuffer;
 
-void initScreen() {
+void initScreen(void) {
 	backBuffer = pageAlloc(vbeInfo.height * vbeInfo.pitch * 3);
 }
 
@@ -27,7 +27,7 @@ uint32_t hueToRgb(uint8_t hue) {
 	}
 }
 
-void refreshScreen() {
+void refreshScreen(void) {
 	uint8_t* ptr = (uint8_t*)vbeInfo.framebuffer;
 	uint32_t bytesSkipped = vbeInfo.pitch - vbeInfo.width * 3;
 	for(uint32_t i = 0; i < vbeInfo.width * vbeInfo.height * 3; ++i) {
