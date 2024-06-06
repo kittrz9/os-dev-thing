@@ -32,7 +32,8 @@ extern kernel
 entry:
 	; copy vbe info
 	; doing this here since it'd probably make it easier when I start working on paging
-	mov esi, dword [esp-0x8] ; old vbe ptr
+	pop esi ; return address (probably wont ever need to return to stage 2)
+	pop esi ; old vbe ptr
 	mov edi, virtToPhys(vbeInfo)
 	mov ecx, 0x100
 	rep movsb

@@ -1,5 +1,7 @@
 # things I need to do
- - implement the rest of string.h
+ - get ld.lld in the llvm toolchain working
+ - implement the rest of libc
+ - get it working with the `-nostdinc` compile flag
  - figure out memory management stuff
  - update page frame allocator (currently works but will need to be changed when I inevitably run out of mapped pages)
  - implement ATA writing and write to the filesystem

@@ -10,6 +10,8 @@ void stage2(struct vbe_mode_info_structure* vbePtr) {
 	serialWriteStr("stage2 loaded at: ");
 	serialWriteHex32((uint32_t)stage2);
 	serialWriteStr("\n");
+	uint32_t* ptr = (uint32_t*)vbePtr->framebuffer;
+	ptr[0] = 0xFF0000;
 
 	if(!initATA()) {
 		initFS();

@@ -34,7 +34,7 @@ export PATH="$PREFIX/bin/:$PATH"
 if [ "$TOOLCHAIN" = "llvm" ]; then
 	cd "$TOOLS_DIR" || exit 1
 	if [ -z "$(command -v "$TARGET-ld")" ]; then
-		echo -e "\n\nthe llvm toolchain needs the gnu toolchain to be built first because I can't figure out why ld.lld isn't working.\nedit the toolchain in config.sh to gnu and rebuild the os, and then try building it with llvm.\n\nthe llvm toolchain also just doesn't work still, the framebuffer doesn't show up but serial seems to work fine.\n\n"
+		echo -e "\n\nthe llvm toolchain needs the gnu toolchain to be built first because I can't figure out why ld.lld isn't working.\nedit the toolchain in config.sh to gnu and rebuild the os, and then try building it with llvm.\n\n"
 		exit 1
 	fi
 	if [ -z "$(command -v clang)" ] || [ -z "$(command -v lld)" ]; then
