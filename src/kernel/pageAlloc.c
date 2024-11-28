@@ -1,52 +1,35 @@
 #include "pageAlloc.h"
 #include <stddef.h>
 
-// this talks about virtual memory managment but I think it'd probably work for this too
-// https://wiki.osdev.org/Page_Frame_Allocation#Flat_List
-
-typedef struct pageHeader_t {
-	struct pageHeader_t* next;
-	uint8_t used;
-	uint32_t size;
-} pageHeader;
-
 extern void* endPage;
 
-pageHeader* firstPage = (pageHeader*)&endPage; // endPage defined by linker
+typedef struct {
+	void* addr;
+	uint32_t pages;
+} pageStackEntry;
 
-void pageAllocInit(void) {
-	firstPage->next = NULL;
-	firstPage->used = 0;
-	firstPage->size = 0;
+#define PAGE_STACK_SIZE 20
 
-	return;
-}
+pageStackEntry pageStack[PAGE_STACK_SIZE];
+uint32_t pageStackPointer;
+
+uint32_t pagesAllocated;
 
 void* pageAlloc(uint32_t bytes) {
-	pageHeader* currentPage = firstPage;
+	uint32_t newPages = bytes / 0x1000;
+	uint32_t returnAddr = (uint32_t)&endPage + (pagesAllocated * 0x1000);
 
-	while((currentPage->used != 0 || currentPage->size < bytes) && currentPage->next != NULL) {
-		currentPage = currentPage->next;
-	}
+	pageStack[pageStackPointer].addr = (void*)returnAddr;
+	pageStack[pageStackPointer].pages = bytes;
+	++pageStackPointer;
 
-	currentPage->next = (pageHeader*)((uint32_t)(currentPage)+bytes+sizeof(pageHeader));
-	// have to cast to an int so it doesn't do full pointer math
-	// the pageHeader* cast is so gcc doesn't throw a warning
-	currentPage->next = (pageHeader*)((uint32_t)(currentPage->next) + 0x1000 - ((uint32_t)(currentPage->next) & 0xFFF)); // align to 4k
-	currentPage->used = 1;
-	currentPage->size = bytes;
+	pagesAllocated += newPages;
 
-
-	currentPage->next->next = NULL;
-	currentPage->next->used = 0;
-	currentPage->next->size = 0;
-
-	return (uint8_t*)currentPage+sizeof(pageHeader);
+	return (void*)returnAddr;
 }
 
-void pageFree(void* ptr) {
-	pageHeader* currentPage = (pageHeader*)((uint8_t*)ptr - sizeof(pageHeader));
-
-	currentPage->used = 0;
+void pageFree(void) {
+	--pageStackPointer;
+	pagesAllocated -= pageStack[pageStackPointer].pages;
 }
 

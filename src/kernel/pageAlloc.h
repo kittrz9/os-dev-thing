@@ -3,9 +3,7 @@
 
 #include <stdint.h>
 
-void pageAllocInit(void);
-
 void* pageAlloc(uint32_t pageCount);
-void pageFree(void* ptr);
+void pageFree(void);
 
 #endif

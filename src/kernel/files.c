@@ -13,7 +13,7 @@ void printFile(char* name) {
 	} else {
 		puts("file not found\n");
 	}
-	pageFree(buffer);
+	pageFree();
 	return;
 }
 

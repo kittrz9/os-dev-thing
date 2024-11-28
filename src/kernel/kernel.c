@@ -22,8 +22,6 @@ void kernel(void) {
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
-	pageAllocInit();
-
 	PICInit();
 
 	uint8_t id = 0;
