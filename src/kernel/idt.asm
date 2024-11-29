@@ -25,6 +25,7 @@ interruptStr:
 	db "interrupt hit!!!!", 0xa, 0x0
 
 extern serialWriteStr
+extern serialWriteHex32
 section .text
 align 4
 interruptHandler:
@@ -33,13 +34,30 @@ interruptHandler:
 	lea eax, interruptStr
 	mov [esp], eax
 	call serialWriteStr
+	add esp, 4
 	; acknowledge to PIC
 	mov al, 0x20
 	out 0x20, al
 	in al, 0x60 ; discard scancode
-	add esp, 4
 	popad
 	iret
+
+section .rodata
+pageFaultStr:
+	db "page fault!!!!!", 0xa, 0x0
+
+section .text
+align 4
+pageFaultHandler:
+	sub esp, 4
+	lea eax, pageFaultStr
+	mov [esp], eax
+	call serialWriteStr
+	add esp, 4
+	pop eax
+	call serialWriteHex32
+	cli
+	hlt
 
 ; https://wiki.osdev.org/Programmable_Interval_Timer#Using_the_IRQ_to_Implement_sleep
 extern countDown
@@ -117,8 +135,14 @@ isrLoop:
 	mov dword [esp+4], eax
 	call setIDTEntry
 
+	mov eax, 14
+	mov dword [esp], pageFaultHandler
+	mov dword [esp+4], eax
+	call setIDTEntry
+
 	lidt [idtr]
 	xchg bx, bx
 	sti
 	add esp, 12
+
 	ret

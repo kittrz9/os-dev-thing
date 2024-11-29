@@ -13,14 +13,10 @@ bits 32
 
 global vbeInfo
 
+extern pageDir
+extern firstPageTable
+extern fbPageTable
 section .bss
-align 0x1000
-pageDir:
-	resb 0x1000
-pageTable:
-	resb 0x1000
-fbPageTable:
-	resb 0x1000
 vbeInfo:
 	resb 0x100
 stackBottom:
@@ -41,7 +37,7 @@ entry:
 	; set up paging stuff
 	; identity map 0x100000
 	mov edi, virtToPhys(pageDir)
-	mov esi, virtToPhys(pageTable)
+	mov esi, virtToPhys(firstPageTable)
 	mov eax, esi
 	or eax, 3 ; present and r/w bit
 	mov dword[edi], eax

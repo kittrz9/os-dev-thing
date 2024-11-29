@@ -10,6 +10,7 @@
 #include "fs.h"
 #include "files.h"
 #include "pageAlloc.h"
+#include "paging.h"
 
 void loadIDT(void);
 
@@ -21,6 +22,14 @@ void kernel(void) {
 	serialWriteStr("\n");
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
+
+	serialWriteStr("mapping page 0x1000...\n");
+	mapPage((void*)0x000000,(void*)0x1000);
+	serialWriteStr("writing to page 0x1000...\n");
+	*(int*)0x1000 = 0xAAAAAAAA;
+	serialWriteStr("reading back from page 0x1000...\n");
+	serialWriteHex32(*(int*)0x1000);
+	serialWriteStr("\n");
 
 	PICInit();
 

@@ -1,6 +1,5 @@
 # things I need to do
- - figure out how to actually set up pages
- - update page frame allocator (currently works but will need to be changed when I inevitably run out of mapped pages, also probably shouldn't put the linked list stuff at the start of the page)
+ - fix paging (setting up page 0x1000 works but everything else crashes, though all physical addresses seem to work when set with that page)
  - figure out how to compile programs to be ran in the os
  - userspace stuff once all the above is finished
  - implement the rest of libc

@@ -37,6 +37,6 @@ done
 
 echo $OBJS
 
-$LD $OBJS $LDFLAGS -T src/kernel/linker.ld -o build/kernel.elf
+$LD $OBJS $LDFLAGS -T src/kernel/linker.ld -o build/kernel.elf -Map=build/kernel.map
 $OBJCOPY -O binary build/kernel.elf build/kernel.bin
 

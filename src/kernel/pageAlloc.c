@@ -8,7 +8,7 @@ typedef struct {
 	uint32_t pages;
 } pageStackEntry;
 
-#define PAGE_STACK_SIZE 20
+#define PAGE_STACK_SIZE 256
 
 pageStackEntry pageStack[PAGE_STACK_SIZE];
 uint32_t pageStackPointer;
