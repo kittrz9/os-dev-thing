@@ -1,5 +1,5 @@
 # things I need to do
- - fix paging (setting up page 0x1000 works but everything else crashes, though all physical addresses seem to work when set with that page)
+ - fix paging (seems to work for a lot of virtual addresses but still crashes past 0x400000, presumably an issue with the page directory)
  - figure out how to compile programs to be ran in the os
  - userspace stuff once all the above is finished
  - implement the rest of libc

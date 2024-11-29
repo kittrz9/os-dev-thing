@@ -23,12 +23,19 @@ void kernel(void) {
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
-	serialWriteStr("mapping page 0x1000...\n");
-	mapPage((void*)0x000000,(void*)0x1000);
-	serialWriteStr("writing to page 0x1000...\n");
-	*(int*)0x1000 = 0xAAAAAAAA;
-	serialWriteStr("reading back from page 0x1000...\n");
-	serialWriteHex32(*(int*)0x1000);
+	uint32_t testPage = 0x3ff000;
+	serialWriteStr("mapping page ");
+	serialWriteHex32(testPage);
+	serialWriteStr("...\n");
+	mapPage((void*)0x000000,(void*)testPage);
+	serialWriteStr("writing to page ");
+	serialWriteHex32(testPage);
+	serialWriteStr("...\n");
+	*(int*)testPage = 0xAAAAAAAA;
+	serialWriteStr("reading back from ");
+	serialWriteHex32(testPage);
+	serialWriteStr("...\n");
+	serialWriteHex32(*(int*)testPage);
 	serialWriteStr("\n");
 
 	PICInit();

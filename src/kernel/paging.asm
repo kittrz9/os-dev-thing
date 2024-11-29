@@ -42,11 +42,11 @@ extern pageAlloc
 ; void mapPage(void* physAddr, void* virtAddr);
 global mapPage
 mapPage:
-	push esi
-	push edi
-	mov esi, [esp+12] ; physAddr
-	mov edi, [esp+16] ; virtAddr
-	sub esp, 4
+	push ebp
+	mov ebp, esp
+	pushad
+	mov esi, [ebp+8] ; physAddr
+	mov edi, [ebp+12] ; virtAddr
 	mov eax, edi
 	dirFromAddr eax
 	mov edx, 4
@@ -88,7 +88,6 @@ pageTableAllocatedCheckEnd:
 	mov cr3, eax
 
 
-	add esp, 4
-	pop edi
-	pop esi
+	popad
+	pop ebp
 	ret
