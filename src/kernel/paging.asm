@@ -57,13 +57,17 @@ mapPage:
 	and ebx, 1
 	jnz pageTableAlreadyAllocated
 	push eax
+	sub esp, 4
+	mov dword [esp], 0x1000
 	call pageAlloc
+	add esp, 4
 	pop ecx
 	mov ebx, eax
 	virtToPhys eax
 	or eax, 3 ; present and rw bits
 	mov [ecx], eax
-	mov eax, ecx
+	mov eax, [ecx]
+	mov eax, ebx
 	jmp pageTableAllocatedCheckEnd
 pageTableAlreadyAllocated:
 	mov eax, [eax]
@@ -72,7 +76,7 @@ pageTableAlreadyAllocated:
 pageTableAllocatedCheckEnd:
 	; eax has page table address
 	mov ebx, eax
-	mov eax, edi
+	mov eax, esi
 	tableFromAddr eax
 	mov edx, 4
 	mul edx
@@ -83,8 +87,7 @@ pageTableAllocatedCheckEnd:
 	or ebx, 3 ; present and rw bits
 	mov [eax], ebx
 
-	mov eax, pageDir
-	virtToPhys eax
+	mov eax, cr3
 	mov cr3, eax
 
 

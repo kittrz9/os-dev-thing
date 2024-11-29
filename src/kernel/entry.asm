@@ -95,6 +95,11 @@ testJmp:
 	; set up gdt again
 	lgdt [gdtr]
 
+	; remove identity mapped pages
+	mov dword[pageDir], 0
+	mov eax, cr3
+	mov cr3, eax
+
 	mov esp, stackTop
 
 	jmp kernel

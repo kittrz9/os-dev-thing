@@ -23,21 +23,6 @@ void kernel(void) {
 
 	serialWriteStr("waga baba bobo!!!! from the kernel!!!!\n");
 
-	uint32_t testPage = 0x3ff000;
-	serialWriteStr("mapping page ");
-	serialWriteHex32(testPage);
-	serialWriteStr("...\n");
-	mapPage((void*)0x000000,(void*)testPage);
-	serialWriteStr("writing to page ");
-	serialWriteHex32(testPage);
-	serialWriteStr("...\n");
-	*(int*)testPage = 0xAAAAAAAA;
-	serialWriteStr("reading back from ");
-	serialWriteHex32(testPage);
-	serialWriteStr("...\n");
-	serialWriteHex32(*(int*)testPage);
-	serialWriteStr("\n");
-
 	PICInit();
 
 	uint8_t id = 0;
@@ -48,6 +33,30 @@ void kernel(void) {
 	PICClearMask(1); // keyboard
 
 	loadIDT();
+
+	extern uint32_t pageDir[256];
+	uint32_t testPage = 0x400000;
+	serialWriteStr("mapping page ");
+	serialWriteHex32(testPage);
+	serialWriteStr("...\n");
+	mapPage((void*)0x1000000,(void*)testPage);
+	serialWriteStr("page dir entry: ");
+	serialWriteHex32((uint32_t)pageDir[testPage >> 22]);
+	serialWriteStr("\n");
+	serialWriteStr("page table entry: ");
+	uint32_t pageTableAddr = pageDir[testPage >> 22] & 0xFFFFF000;
+	uint32_t* pageTable = (uint32_t*)VIRT_TO_PHYS(pageTableAddr);
+	serialWriteHex32(pageTable[(testPage >> 12) & 0xFFF]);
+	serialWriteStr("\n");
+	serialWriteStr("writing to page ");
+	serialWriteHex32(testPage);
+	serialWriteStr("...\n");
+	*(int*)testPage = 0xAAAAAAAA;
+	serialWriteStr("reading back from ");
+	serialWriteHex32(testPage);
+	serialWriteStr("...\n");
+	serialWriteHex32(*(int*)testPage);
+	serialWriteStr("\n");
 
 	//timerSetFreq(2, TIMER_SQUARE2, 440);
 	timerSetFreqDiv(0, TIMER_SQUARE2, 1194); // ~1ms
