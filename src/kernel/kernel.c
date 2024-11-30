@@ -35,7 +35,7 @@ void kernel(void) {
 	loadIDT();
 
 	extern uint32_t pageDir[256];
-	uint32_t testPage = 0x400000;
+	uint32_t testPage = 0x401000;
 	serialWriteStr("mapping page ");
 	serialWriteHex32(testPage);
 	serialWriteStr("...\n");
@@ -46,7 +46,7 @@ void kernel(void) {
 	serialWriteStr("page table entry: ");
 	uint32_t pageTableAddr = pageDir[testPage >> 22] & 0xFFFFF000;
 	uint32_t* pageTable = (uint32_t*)VIRT_TO_PHYS(pageTableAddr);
-	serialWriteHex32(pageTable[(testPage >> 12) & 0xFFF]);
+	serialWriteHex32(pageTable[(testPage >> 12) & 0xBFF]);
 	serialWriteStr("\n");
 	serialWriteStr("writing to page ");
 	serialWriteHex32(testPage);

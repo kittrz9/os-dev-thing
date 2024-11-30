@@ -18,7 +18,7 @@ bits 32
 
 %macro tableFromAddr 1
 	shr %1, 12
-	and %1, 0xFFF
+	and %1, 0xBFF
 %endmacro
 
 global pageDir
@@ -76,7 +76,7 @@ pageTableAlreadyAllocated:
 pageTableAllocatedCheckEnd:
 	; eax has page table address
 	mov ebx, eax
-	mov eax, esi
+	mov eax, edi
 	tableFromAddr eax
 	mov edx, 4
 	mul edx
