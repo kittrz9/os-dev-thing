@@ -18,8 +18,7 @@ uint32_t pageStackPointer;
 uint32_t pagesAllocated;
 
 void* pageAlloc(uint32_t bytes) {
-	uint32_t newPages = bytes / 0x1000;
-	if(newPages == 0) { newPages = 1; }
+	uint32_t newPages = bytes / 0x1000 + (bytes % 0x1000 != 0);
 	uint32_t returnAddr = (uint32_t)&endPage + (pagesAllocated * 0x1000);
 
 	pageStack[pageStackPointer].addr = (void*)returnAddr;
