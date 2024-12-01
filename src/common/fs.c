@@ -21,8 +21,8 @@ uint32_t parseOctStr(char* str) {
 }
 
 // having these get put into bss made them unitialized, I should probably init bss to 0 myself but whatever this works for now
-__attribute__((section("data"))) uint32_t fsSize = 0;
-__attribute__((section("data"))) uint32_t fsLBA = 0;
+__attribute__((section(".data"))) uint32_t fsSize = 0;
+__attribute__((section(".data"))) uint32_t fsLBA = 0;
 
 void initFS(void) {
 	uint8_t buffer[512];
