@@ -7,13 +7,14 @@
 #include "pageAlloc.h"
 
 void printFile(char* name) {
-	uint8_t* buffer = pageAlloc(getFileSize(name)); // should probably not be traversing the file system twice here but whatever
+	uint32_t fileSize = getFileSize(name); // should probably not be traversing the file system twice here but whatever
+	uint8_t* buffer = pageAlloc(fileSize); 
 	if(readFile(name, buffer)) {
 		puts((char*)buffer);
 	} else {
 		puts("file not found\n");
 	}
-	pageFree();
+	pageFree(fileSize);
 	return;
 }
 
