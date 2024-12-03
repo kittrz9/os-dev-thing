@@ -5,4 +5,6 @@
 
 void handleScancode(uint8_t scanecode);
 
+char readKey(void);
+
 #endif

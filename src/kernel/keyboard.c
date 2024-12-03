@@ -116,25 +116,37 @@ char shiftScancodeLUT[] = {
 	[0x39] = ' ',
 };
 
+#define KEY_QUEUE_SIZE 32
+// don't want these to be uninitialized
+__attribute__((section(".data"))) char keyQueue[KEY_QUEUE_SIZE];
+__attribute__((section(".data"))) uint8_t keyQueuePointer = 0;
+
+char readKey(void) { 
+	char c = keyQueue[0];
+	for(uint8_t i = 0; i < KEY_QUEUE_SIZE; ++i) {
+		//if(keyQueue[i] == '\0') { break; }
+		keyQueue[i] = keyQueue[i+1];
+	}
+	if(keyQueuePointer != 0) { --keyQueuePointer; }
+	return c;
+}
+
 void handleScancode(uint8_t scancode) {
 	char c;
 
-	/*serialWriteStr("scancode: ");
-	serialWriteHex32(scancode);
-	serialWriteStr("\n");*/
 	if(scancode == 0x36 || scancode == 0x2a) { 
 		shift = 1;
-		//serialWriteStr("shift on\n");
 		return; 
 	}
 	if(scancode == 0xb6 || scancode == 0xaa) {
 		shift = 0;
-		//serialWriteStr("shift off\n");
 		return; 
 	}
 	if(scancode & 0x80) { 
 		return; 
 	}
+
+	if(keyQueuePointer == KEY_QUEUE_SIZE-1) { serialWriteStr("QUEUE FULL\n"); return; }
 
 	if(shift) {
 		c = shiftScancodeLUT[scancode];
@@ -144,11 +156,9 @@ void handleScancode(uint8_t scancode) {
 
 	if(c != '\n' && c != '\b' && c != '\t' && (c < ' ' || c > '~')) { return; }
 
-	//keyboardStr[i] = c;
-	putc(c);
-
-	/*++i;
-	if(i >= 256) { i = 0; }*/
+	keyQueue[keyQueuePointer] = c;
+	++keyQueuePointer;
 
 	return;
 }
+

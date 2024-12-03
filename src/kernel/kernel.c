@@ -101,6 +101,9 @@ void kernel(void) {
 		}
 		++hue;
 
+		// should ideally be checking for if it returns null but putc ignores null bytes
+		putc(readKey());
+
 		drawTerm();
 
 		refreshScreen();
