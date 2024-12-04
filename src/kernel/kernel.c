@@ -35,6 +35,9 @@ void kernel(void) {
 
 	loadIDT();
 
+	/*mapPages((void*)0x1000000, (void*)0x401000, 0x10);
+	*(uint8_t*)0x410000 = 0;*/
+
 	/*extern uint32_t pageDir[256];
 	uint32_t testPage = 0x401000;
 	serialWriteStr("mapping page ");
@@ -90,10 +93,12 @@ void kernel(void) {
 	elfFileHeader* elfHeader = (elfFileHeader*)buffer;
 	elfProgramHeader* pHeaders = (elfProgramHeader*)(buffer + elfHeader->programHeadersOffset);
 	elfSectionHeader* sHeaders = (elfSectionHeader*)(buffer + elfHeader->sectionHeadersOffset);
-	mapPage(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr);
+	//mapPage(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr);
+	mapPages(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr, BYTES_TO_PAGES(pHeaders[1].size));
 	serialWriteStr("calling file entry point\n");
 	((void(*)(void))elfHeader->entry)();
 	serialWriteStr("didn't die!!!!!\n");
+	pageFree(fileSize);
 	
 	uint8_t hue = 0;
 	while(1) {

@@ -8,7 +8,6 @@ PHDRS {
 ENTRY(entry)
 
 SECTIONS {
-	/* https://wiki.osdev.org/Higher_Half_x86_Bare_Bones#linker.ld */
 	. = SIZEOF_HEADERS + 0x40000;
 	.text : {
 		*(.text);

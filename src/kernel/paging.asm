@@ -90,7 +90,35 @@ pageTableAllocatedCheckEnd:
 	mov eax, cr3
 	mov cr3, eax
 
+	popad
+	pop ebp
+	ret
+
+; void mapPages(void* physAddr, void* virtAddr, uint16_t pageCount);
+global mapPages
+mapPages:
+	push ebp
+	mov ebp, esp
+	pushad
+
+	mov esi, [ebp+8] ; physAddr
+	mov edi, [ebp+12] ; virtAddr
+	mov cx, [ebp+16] ; pageCount
+
+	sub esp, 12
+pageLoop:
+	mov [esp], esi
+	mov [esp+4], edi
+	call mapPage
+	add esi, 0x1000
+	add edi, 0x1000
+	dec cx
+	jnz pageLoop
+	add esp, 12
+
 
 	popad
 	pop ebp
 	ret
+
+

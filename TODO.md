@@ -1,7 +1,6 @@
 # things I need to do
  - implement more syscalls (int 0x80 currently just prints whatever eax is pointing)
  - make loading elf files not garbage, maybe load multiple sections or something
- - add a way to map multiple pages at once
  - multitasking
  - maybe not run everything in kernel mode
  - implement the rest of libc

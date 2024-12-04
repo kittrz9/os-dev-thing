@@ -1,7 +1,7 @@
 bits 32
 
 asdf:
-	db "printing from test.elf!!!", 0xa
+	db "printing from test.elf!!!", 0xa, 0
 global entry
 entry:
 	lea eax, asdf
