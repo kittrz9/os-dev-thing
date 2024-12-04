@@ -77,6 +77,7 @@ timerDone:
 
 extern handleScancode
 section .text
+align 4
 keyboardHandler:
 	pushad
 	sub esp, 4
@@ -84,6 +85,19 @@ keyboardHandler:
 	in al, 0x60
 	mov [esp], eax
 	call handleScancode
+	add esp, 4
+	mov al, 0x20
+	out 0x20, al
+	popad
+	iret
+
+extern puts
+align 4
+softwareIntHandler:
+	pushad
+	sub esp, 4
+	mov [esp], eax
+	call puts
 	add esp, 4
 	mov al, 0x20
 	out 0x20, al
@@ -137,6 +151,11 @@ isrLoop:
 
 	mov eax, 14
 	mov dword [esp], pageFaultHandler
+	mov dword [esp+4], eax
+	call setIDTEntry
+
+	mov eax, 0x80
+	mov dword [esp], softwareIntHandler
 	mov dword [esp+4], eax
 	call setIDTEntry
 

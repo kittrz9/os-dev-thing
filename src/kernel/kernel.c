@@ -81,7 +81,6 @@ void kernel(void) {
 		listFiles();
 		puts("reading TODO.md\n\n");
 		printFile("TODO.md");
-		listFiles();
 	}
 
 	// will eventually do this in a way that isn't garbage
