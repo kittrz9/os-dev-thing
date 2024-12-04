@@ -33,6 +33,8 @@ OBJS=""
 
 . ./src/kernel/build.sh
 
+. ./src/programs/build.sh
+
 # incredibly jank solution to getting the stage2 size into boot.asm lmao
 # also now requires stage2 to be built before boot.asm but whatever
 STAGE2_SIZE="$(python -c "import os; import math; a=os.path.getsize(\"build/stage2.bin\");print(math.ceil(a/512))")"
