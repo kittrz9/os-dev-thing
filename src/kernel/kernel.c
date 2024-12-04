@@ -11,6 +11,7 @@
 #include "files.h"
 #include "pageAlloc.h"
 #include "paging.h"
+#include "elf.h"
 
 void loadIDT(void);
 
@@ -34,7 +35,7 @@ void kernel(void) {
 
 	loadIDT();
 
-	extern uint32_t pageDir[256];
+	/*extern uint32_t pageDir[256];
 	uint32_t testPage = 0x401000;
 	serialWriteStr("mapping page ");
 	serialWriteHex32(testPage);
@@ -56,7 +57,7 @@ void kernel(void) {
 	serialWriteHex32(testPage);
 	serialWriteStr("...\n");
 	serialWriteHex32(*(int*)testPage);
-	serialWriteStr("\n");
+	serialWriteStr("\n");*/
 
 	//timerSetFreq(2, TIMER_SQUARE2, 440);
 	timerSetFreqDiv(0, TIMER_SQUARE2, 1194); // ~1ms
@@ -80,8 +81,21 @@ void kernel(void) {
 		listFiles();
 		puts("reading TODO.md\n\n");
 		printFile("TODO.md");
+		listFiles();
 	}
 
+	// will eventually do this in a way that isn't garbage
+	uint32_t fileSize = getFileSize("test.elf");
+	uint8_t* buffer = pageAlloc(fileSize); 
+	readFile("test.elf", buffer);
+	elfFileHeader* elfHeader = (elfFileHeader*)buffer;
+	elfProgramHeader* pHeaders = (elfProgramHeader*)(buffer + elfHeader->programHeadersOffset);
+	elfSectionHeader* sHeaders = (elfSectionHeader*)(buffer + elfHeader->sectionHeadersOffset);
+	mapPage(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr);
+	serialWriteStr("calling file entry point\n");
+	((void(*)(void))elfHeader->entry)();
+	serialWriteStr("didn't die!!!!!\n");
+	
 	uint8_t hue = 0;
 	while(1) {
 		uint32_t color = hueToRgb(hue);

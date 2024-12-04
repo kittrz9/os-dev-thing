@@ -45,6 +45,9 @@ mv build/kernel.bin ./
 
 # eventually make this its own folder with stuff in it
 tar -cvf build/fs.tar TODO.md kernel.bin -b 1
+cd "$ORIGIN_DIR"/build/programs
+tar -rf "$ORIGIN_DIR"/build/fs.tar *.elf
+cd "$ORIGIN_DIR"
 FS_SIZE="$(python -c "import os; import math; a=os.path.getsize(\"build/fs.tar\");print(math.ceil(a/512))")"
 
 mv kernel.bin build/
