@@ -91,14 +91,21 @@ keyboardHandler:
 	popad
 	iret
 
-extern puts
+extern handleSyscalls
 align 4
 softwareIntHandler:
 	pushad
-	sub esp, 4
+	sub esp, 4*6
 	mov [esp], eax
-	call puts
-	add esp, 4
+	mov [esp+4], ebx
+	mov [esp+8], ecx
+	mov [esp+12], edx
+	mov [esp+16], edi
+	mov [esp+24], esi
+	push esp
+	call handleSyscalls
+	pop esp
+	add esp, 4*6
 	mov al, 0x20
 	out 0x20, al
 	popad
