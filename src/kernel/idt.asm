@@ -94,8 +94,9 @@ keyboardHandler:
 extern handleSyscalls
 align 4
 softwareIntHandler:
-	pushad
-	sub esp, 4*6
+	push ebp
+	mov ebp, esp
+	sub esp, 4*7
 	mov [esp], eax
 	mov [esp+4], ebx
 	mov [esp+8], ecx
@@ -105,10 +106,19 @@ softwareIntHandler:
 	push esp
 	call handleSyscalls
 	pop esp
-	add esp, 4*6
+	add esp, 4*7
+	mov ebx, [eax+4]
+	mov ecx, [eax+8]
+	mov edx, [eax+16]
+	mov edi, [eax+20]
+	mov esi, [eax+24]
+	mov eax, [eax]
+	push eax
 	mov al, 0x20
 	out 0x20, al
-	popad
+	pop eax
+	mov esp, ebp
+	pop ebp
 	iret
 
 setIDTEntry:

@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void handleSyscalls(uint32_t regs[6]);
+uint32_t* handleSyscalls(uint32_t regs[6]);
 
 #endif
