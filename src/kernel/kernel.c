@@ -102,29 +102,10 @@ void kernel(void) {
 	
 	uint8_t hue = 0;
 	while(1) {
-		uint32_t color = hueToRgb(hue);
-		// assuming color format, cringe but works in qemu for now lmao
-		uint8_t b = (color&0xff);
-		uint8_t g = (color&0xff00)>>8;
-		uint8_t r = (color&0xff0000)>>16;
-		uint8_t* ptr = backBuffer;
-		uint16_t pitch = vbeInfo.pitch;
-		for(uint16_t line = 0; line < 480; ++line) {
-			for(uint16_t i = 0; i < 640*3; i+=3) {
-				*(ptr+i) = b;
-				*(ptr+i+1) = g;
-				*(ptr+i+2) = r;
-			}
-			ptr += pitch;
-		}
-		++hue;
-
 		// should ideally be checking for if it returns null but putc ignores null bytes
 		putc(readKey());
 
-		drawTerm();
-
-		refreshScreen();
+		//drawTerm();
 
 		sleep(20);
 

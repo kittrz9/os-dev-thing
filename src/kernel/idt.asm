@@ -59,20 +59,32 @@ pageFaultHandler:
 	cli
 	hlt
 
+section .data
+termUpdateCounter:
+	dq 20
 ; https://wiki.osdev.org/Programmable_Interval_Timer#Using_the_IRQ_to_Implement_sleep
 extern countDown
+extern drawTerm
 align 4
 timerHandler:
-	push eax
+	pushad
 	mov eax, [countDown]
 	test eax, eax
 	jz timerDone
 	dec eax
 	mov [countDown], eax
 timerDone:
+	; this should really be done with multitasking but whatever this works for now
+	mov eax, [termUpdateCounter]
+	dec eax
+	jnz noTermUpdate
+	call drawTerm
+	mov eax, 20
+noTermUpdate:
+	mov [termUpdateCounter], eax
 	mov al, 0x20
 	out 0x20, al
-	pop eax
+	popad
 	iret
 
 extern handleScancode
