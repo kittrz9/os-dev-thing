@@ -12,13 +12,11 @@
 #include "pageAlloc.h"
 #include "paging.h"
 #include "elf.h"
+#include "shell.h"
 
 void loadIDT(void);
 
 void kernel(void) {
-	extern uint32_t bssStart;
-	extern uint32_t bssEnd;
-
 	initSerial();
 
 	serialWriteStr("kernel loaded at: ");
@@ -105,13 +103,8 @@ void kernel(void) {
 	
 	uint8_t hue = 0;
 	while(1) {
-		// should ideally be checking for if it returns null but putc ignores null bytes
-		putc(readKey());
-
-		//drawTerm();
-
-		sleep(20);
-
+		runShell();
+		//sleep(20);
 	}
 
 	serialWriteStr("done\n");

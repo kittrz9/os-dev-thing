@@ -22,6 +22,14 @@ void* memcpy(const void* s1, const void* s2, size_t n) {
 	return s1;
 }
 
+void* memset(const void* s, uint8_t c, size_t n) {
+	uint8_t* p = (uint8_t*)s;
+	for(size_t i = 0; i < n; ++i) {
+		p[i] = c;
+	}
+	return s;
+}
+
 int strcmp(const char* str1, const char* str2) {
 	size_t i = 0;
 	while(str1[i] != '\0' && str2[i] != '\0') {
