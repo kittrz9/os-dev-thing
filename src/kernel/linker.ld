@@ -20,9 +20,11 @@ SECTIONS {
 	.data ALIGN(4K) : AT(ADDR(.data) - 0x80000000) {
 		*(.data);
 	}
+	bssStart = ALIGN(4);
 	.bss ALIGN(4K) : AT(ADDR(.bss) - 0x80000000) {
 		*(.bss);
 	}
+	bssEnd = ALIGN(4);
 	endPage = ALIGN(4K);
 	/DISCARD/ : {
 		*(.debug_info)

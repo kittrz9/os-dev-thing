@@ -16,9 +16,11 @@ global vbeInfo
 extern pageDir
 extern firstPageTable
 extern fbPageTable
-section .bss
+section .data
 vbeInfo:
 	resb 0x100
+
+section .bss
 stackBottom:
 	resb 0x4000 ; 16k
 stackTop:
@@ -101,6 +103,17 @@ testJmp:
 	mov cr3, eax
 
 	mov esp, stackTop
+
+	; init bss to 0
+	; maybe should be done before paging is set up so stuff like the page dir and tables can be put in bss and not take up space in the executable itself, but this works for now
+extern bssStart
+extern bssEnd
+	mov eax, bssStart
+bssInitLoop:
+	mov dword[eax], 0
+	add eax, 4
+	cmp eax, bssEnd
+	jl bssInitLoop
 
 	jmp kernel
 

@@ -117,9 +117,8 @@ char shiftScancodeLUT[] = {
 };
 
 #define KEY_QUEUE_SIZE 32
-// don't want these to be uninitialized
-__attribute__((section(".data"))) char keyQueue[KEY_QUEUE_SIZE];
-__attribute__((section(".data"))) uint8_t keyQueuePointer = 0;
+char keyQueue[KEY_QUEUE_SIZE];
+uint8_t keyQueuePointer = 0;
 
 char readKey(void) { 
 	char c = keyQueue[0];

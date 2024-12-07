@@ -16,6 +16,9 @@
 void loadIDT(void);
 
 void kernel(void) {
+	extern uint32_t bssStart;
+	extern uint32_t bssEnd;
+
 	initSerial();
 
 	serialWriteStr("kernel loaded at: ");
