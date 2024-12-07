@@ -19,7 +19,7 @@ void* memcpy(const void* s1, const void* s2, size_t n) {
 		p1[i] = p2[i];
 		++i;
 	}
-	return s1;
+	return p1;
 }
 
 void* memset(const void* s, uint8_t c, size_t n) {
@@ -27,7 +27,7 @@ void* memset(const void* s, uint8_t c, size_t n) {
 	for(size_t i = 0; i < n; ++i) {
 		p[i] = c;
 	}
-	return s;
+	return p;
 }
 
 int strcmp(const char* str1, const char* str2) {

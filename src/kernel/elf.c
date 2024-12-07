@@ -19,8 +19,12 @@ void* loadElf(char* fileName) {
 	elfFileHeader* elfHeader = (elfFileHeader*)buffer;
 	elfProgramHeader* pHeaders = (elfProgramHeader*)(buffer + elfHeader->programHeadersOffset);
 	elfSectionHeader* sHeaders = (elfSectionHeader*)(buffer + elfHeader->sectionHeadersOffset);
+	// hard coded to load the second program header that just has everything in it
+	// should probably be fixed
+	(void)sHeaders; // unused
 	mapPages(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr, BYTES_TO_PAGES(pHeaders[1].size));
 	loadedElfEntry = ((void(*)(void))elfHeader->entry);
+	return buffer;
 }
 
 void launchElf(void) {

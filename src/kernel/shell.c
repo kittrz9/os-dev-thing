@@ -8,8 +8,9 @@
 #include "paging.h"
 #include "fs.h"
 
+char cmdBuffer[64];
+
 void runShell(void) {
-	char cmdBuffer[64];
 	memset(cmdBuffer, 0, 64);
 	uint8_t cmdBufferPointer = 0;
 	char input = readKey();

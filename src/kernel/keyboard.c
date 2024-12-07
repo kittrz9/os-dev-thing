@@ -125,7 +125,7 @@ char readKey(void) {
 	// could maybe disable the interrrupt with the PIC or just disable interrupts entirely
 	// but I'm not sure if those would have any other consequences
 	char c = keyQueue[0];
-	for(uint8_t i = 0; i < KEY_QUEUE_SIZE; ++i) {
+	for(uint8_t i = 0; i < KEY_QUEUE_SIZE-1; ++i) {
 		//if(keyQueue[i] == '\0') { break; }
 		keyQueue[i] = keyQueue[i+1];
 	}

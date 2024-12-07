@@ -97,7 +97,6 @@ void kernel(void) {
 		freeElf();
 	}
 	
-	uint8_t hue = 0;
 	while(1) {
 		runShell();
 		//sleep(20);
