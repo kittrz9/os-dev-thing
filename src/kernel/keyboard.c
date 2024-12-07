@@ -121,6 +121,9 @@ char keyQueue[KEY_QUEUE_SIZE];
 uint8_t keyQueuePointer = 0;
 
 char readKey(void) { 
+	// might lead to shenanigans if the keyboard interrupt happens during this function
+	// could maybe disable the interrrupt with the PIC or just disable interrupts entirely
+	// but I'm not sure if those would have any other consequences
 	char c = keyQueue[0];
 	for(uint8_t i = 0; i < KEY_QUEUE_SIZE; ++i) {
 		//if(keyQueue[i] == '\0') { break; }

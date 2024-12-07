@@ -4,7 +4,7 @@
  - implement ATA writing and write to the filesystem
  - improve shell (add the ability to pass args and stuff like that)
  - add more programs (maybe a port of ed and a simple assembler)
- - make loading elf files not garbage, maybe load multiple sections or something
+ - load elf files in a non-hardcoded way
  - maybe not run everything in kernel mode
  - multitasking
  - get ld.lld in the llvm toolchain working

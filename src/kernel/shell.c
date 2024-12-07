@@ -33,20 +33,12 @@ void runShell(void) {
 	putc('\n');
 	puts(cmdBuffer);
 	putc('\n');
-	uint32_t fileSize = getFileSize(cmdBuffer);
-	if(fileSize == 0) {
+	if(loadElf(cmdBuffer) == NULL) {
 		puts("could not find program \"");
 		puts(cmdBuffer);
 		puts("\"\n");
 	} else {
-		// need to move this to a separate file
-		uint8_t* buffer = pageAlloc(fileSize); 
-		readFile(cmdBuffer, buffer);
-		elfFileHeader* elfHeader = (elfFileHeader*)buffer;
-		elfProgramHeader* pHeaders = (elfProgramHeader*)(buffer + elfHeader->programHeadersOffset);
-		elfSectionHeader* sHeaders = (elfSectionHeader*)(buffer + elfHeader->sectionHeadersOffset);
-		mapPages(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr, BYTES_TO_PAGES(pHeaders[1].size));
-		((void(*)(void))elfHeader->entry)();
-		pageFree(fileSize);
+		launchElf();
+		freeElf();
 	}
 }

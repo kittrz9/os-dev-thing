@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "serial.h"
 #include "io.h"
 #include "screen.h"
@@ -88,18 +90,12 @@ void kernel(void) {
 	}
 
 	// will eventually do this in a way that isn't garbage
-	uint32_t fileSize = getFileSize("test.elf");
-	uint8_t* buffer = pageAlloc(fileSize); 
-	readFile("test.elf", buffer);
-	elfFileHeader* elfHeader = (elfFileHeader*)buffer;
-	elfProgramHeader* pHeaders = (elfProgramHeader*)(buffer + elfHeader->programHeadersOffset);
-	elfSectionHeader* sHeaders = (elfSectionHeader*)(buffer + elfHeader->sectionHeadersOffset);
-	//mapPage(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr);
-	mapPages(VIRT_TO_PHYS(buffer), (void*)pHeaders[1].virtAddr, BYTES_TO_PAGES(pHeaders[1].size));
-	serialWriteStr("calling file entry point\n");
-	((void(*)(void))elfHeader->entry)();
-	serialWriteStr("didn't die!!!!!\n");
-	pageFree(fileSize);
+	if(loadElf("test.elf") == NULL) {
+		serialWriteStr("could not find test.elf");
+	} else {
+		launchElf();
+		freeElf();
+	}
 	
 	uint8_t hue = 0;
 	while(1) {

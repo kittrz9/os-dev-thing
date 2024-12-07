@@ -50,4 +50,7 @@ typedef struct {
 	uint32_t entSize;
 } elfSectionHeader;
 
+void* loadElf(char* fileName);
+void launchElf(void);
+void freeElf(void);
 #endif // ELF_H
