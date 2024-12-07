@@ -108,22 +108,22 @@ align 4
 softwareIntHandler:
 	push ebp
 	mov ebp, esp
-	sub esp, 4*7
+	sub esp, 4*6
 	mov [esp], eax
 	mov [esp+4], ebx
 	mov [esp+8], ecx
 	mov [esp+12], edx
 	mov [esp+16], edi
-	mov [esp+24], esi
+	mov [esp+20], esi
 	push esp
 	call handleSyscalls
 	pop esp
-	add esp, 4*7
+	add esp, 4*6
 	mov ebx, [eax+4]
 	mov ecx, [eax+8]
-	mov edx, [eax+16]
-	mov edi, [eax+20]
-	mov esi, [eax+24]
+	mov edx, [eax+12]
+	mov edi, [eax+16]
+	mov esi, [eax+20]
 	mov eax, [eax]
 	push eax
 	mov al, 0x20
