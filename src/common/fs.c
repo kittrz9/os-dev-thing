@@ -41,7 +41,6 @@ void initFS(void) {
 }
 
 uint32_t getFileSize(char* name) {
-	if(name[0] == '\0') { return 0; }
 	uint8_t buffer[512];
 
 	if(fsSize == 0) {

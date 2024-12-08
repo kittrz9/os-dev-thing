@@ -31,14 +31,13 @@ void* memset(const void* s, uint8_t c, size_t n) {
 }
 
 int strcmp(const char* str1, const char* str2) {
-	size_t i = 0;
-	while(str1[i] != '\0' && str2[i] != '\0') {
-		if(str1[i] != str2[i]) {
-			return (str1[i] < str2[i] ? -1 : 1);
-		}
-		++i;
-	}
-	return 0;
+	size_t l1 = strlen(str1);
+	size_t l2 = strlen(str2);
+
+	// maybe doesn't return the correct value according to the standard
+	// but I don't care since right now I'm just checking if it's returning 0
+	if(l1 != l2) { return l1 - l2; }
+	return memcmp(str1, str2, l1);
 }
 
 char* strcpy(char* restrict dst, const char* restrict src) {

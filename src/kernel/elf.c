@@ -14,6 +14,7 @@ void* loadElf(char* fileName) {
 	if(fileSize == 0) {
 		return NULL;
 	}
+	elfAllocatedPages = fileSize;
 	uint8_t* buffer = pageAlloc(fileSize); 
 	readFile(fileName, buffer);
 	elfFileHeader* elfHeader = (elfFileHeader*)buffer;
