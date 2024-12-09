@@ -25,7 +25,7 @@ global pageDir
 global firstPageTable
 global fbPageTable
 
-section .data
+section .bss
 align 0x1000
 pageDir:
 	resb 0x1000

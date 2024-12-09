@@ -16,11 +16,10 @@ global vbeInfo
 extern pageDir
 extern firstPageTable
 extern fbPageTable
-section .data
-vbeInfo:
-	resb 0x100
 
 section .bss
+vbeInfo:
+	resb 0x100
 stackBottom:
 	resb 0x4000 ; 16k
 stackTop:
@@ -28,6 +27,16 @@ stackTop:
 section .entry
 extern kernel
 entry:
+	; init bss to 0
+extern bssStart
+extern bssEnd
+	mov eax, virtToPhys(bssStart)
+bssInitLoop:
+	mov dword[eax], 0
+	add eax, 4
+	cmp eax, virtToPhys(bssEnd)
+	jl bssInitLoop
+
 	; copy vbe info
 	; doing this here since it'd probably make it easier when I start working on paging
 	pop esi ; return address (probably wont ever need to return to stage 2)
@@ -104,16 +113,6 @@ testJmp:
 
 	mov esp, stackTop
 
-	; init bss to 0
-	; maybe should be done before paging is set up so stuff like the page dir and tables can be put in bss and not take up space in the executable itself, but this works for now
-extern bssStart
-extern bssEnd
-	mov eax, bssStart
-bssInitLoop:
-	mov dword[eax], 0
-	add eax, 4
-	cmp eax, bssEnd
-	jl bssInitLoop
 
 	jmp kernel
 
