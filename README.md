@@ -15,10 +15,10 @@ some very early parts of the bootloader (specifically how the stack and GDT are 
 ## building
 
 if your host system is running linux (I haven't tested it on any other similar platforms but it might still work) you should just be able to run `build.sh` and it will download and compile the necessary tools so you don't need to make your own cross compiler<br>
-you will need the following programs installed to build this:
- - git (if nasm isn't already installed, or if you want to use the llvm toolchain and don't have clang installed)
- - a C compiler (making the cross compiler has only been tested with gcc so clang might not work)
- - wget
+<br>
+to build this you will need to have installed wget, a c compiler, make, and either nasm or git (`getTools.sh` can build nasm by cloning the git repo).<br>
+<br>
+compiling clang htrough `getTools.sh` will also require git and cmake<br>
 <br>
 you can edit `config.sh` if you wish to change the version of gcc or binutils to be downloaded, or to use the llvm toolchain instead (which still requires binutils to be built since I can't get ld.lld to work)<br>
 
