@@ -15,12 +15,14 @@ if [ ! -d "$TOOLS_DIR" ]; then
 fi
 
 # build nasm if not found
-if [ -z "$(command -v nasm)" ] && [ ! -d "./nasm" ]; then
-	git clone https://github.com/netwide-assembler/nasm --depth=1 --branch nasm-2.16.02rc7 nasm
-	cd nasm || exit 1
-	./autogen.sh
-	./configure
-	make "-j$THREAD_COUNT"
+if [ -z "$(command -v nasm)" ]; then
+	if [ ! -d "./nasm" ]; then
+		git clone https://github.com/netwide-assembler/nasm --depth=1 --branch nasm-2.16.02rc7 nasm
+		cd nasm || exit 1
+		./autogen.sh
+		./configure
+		make "-j$THREAD_COUNT"
+	fi
 	export PATH="$PATH:./tools/nasm/"
 fi
 

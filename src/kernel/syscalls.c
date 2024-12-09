@@ -7,7 +7,7 @@
 
 uint32_t* handleSyscalls(uint32_t regs[6]) {
 	switch(regs[0]) {
-		case 0:
+		case 0: {
 			char* str = (char*)regs[1];
 			// ecx has the length of the string, or 0 if its null terminated
 			size_t length = regs[2];
@@ -18,6 +18,7 @@ uint32_t* handleSyscalls(uint32_t regs[6]) {
 				putc(str[i]);
 			}
 			break;
+		}
 		case 1:
 			// maybe could be made to wait until a valid key is returned like how the read syscall on linux works
 			// so that programs don't need to continuously check for 0
