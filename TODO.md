@@ -1,7 +1,7 @@
 # things I need to do
- - implement more syscalls (currently just has one that prints whatever ebx is pointing to)
  - switch to a better filesystem (FAT32?)
  - implement ATA writing and write to the filesystem
+ - implement more syscalls
  - improve shell (add the ability to pass args and stuff like that)
  - add more programs (maybe a port of ed and a simple assembler)
  - load elf files in a non-hardcoded way

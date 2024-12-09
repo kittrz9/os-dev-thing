@@ -3,14 +3,25 @@
 #include "serial.h"
 #include "term.h"
 #include "string.h"
-
-uint32_t returnRegs[6];
+#include "keyboard.h"
 
 uint32_t* handleSyscalls(uint32_t regs[6]) {
-	memcpy(returnRegs, regs, sizeof(returnRegs));
 	switch(regs[0]) {
 		case 0:
-			puts((char*)regs[1]);
+			char* str = (char*)regs[1];
+			// ecx has the length of the string, or 0 if its null terminated
+			size_t length = regs[2];
+			if(length == 0) {
+				length = strlen(str);
+			}
+			for(size_t i = 0; i < length; ++i) {
+				putc(str[i]);
+			}
+			break;
+		case 1:
+			// maybe could be made to wait until a valid key is returned like how the read syscall on linux works
+			// so that programs don't need to continuously check for 0
+			regs[1] = readKey();
 			break;
 		default:
 			serialWriteStr("unknown syscall: ");
@@ -18,5 +29,5 @@ uint32_t* handleSyscalls(uint32_t regs[6]) {
 			serialWriteChar('\n');
 			asm("cli;hlt");
 	}
-	return returnRegs;
+	return regs;
 }
