@@ -30,7 +30,7 @@ void initFS(void) {
 	mbrPartition* fsPart = (mbrPartition*)(buffer+PARTITION2_OFFSET);
 
 	fsSize = fsPart->size;
-	fsLBA = fsPart->lba;
+	fsLBA = fsPart->lba-1;
 	readATA(fsLBA, 1, (uint16_t*)buffer);
 	ustarHeader* header = (ustarHeader*)buffer;
 	if(memcmp(header->ustarStr, "ustar", 5) != 0) {

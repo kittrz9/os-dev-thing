@@ -175,57 +175,7 @@ gdt:
 gdtEnd:
 
 
-times 0x1be-($-$$) db 0
-
-; https://wiki.osdev.org/Partition_Table
-; idk how cylinder head sector stuff works lmao
-part1entry:
-	db 0x80 ; boot flag
-	db 0; starting head
-	db 1; starting sector + highest 2 bits of start cylinder
-	db 0; starting cylinder
-	db 0x7f; system id
-	db 0; ending head
-	db stage2size + 1; ending sector + highest 2 bits of end cylinder
-	db 0; ending cylinder
-	dd 0; relative sector
-	dd 2; total sectors
-
-part2entry:
-	db 0 ; boot flag
-	db 0; starting head
-	db 0; starting sector + highest 2 bits of start cylinder
-	db 0; starting cylinder
-	db 0; system id
-	db 0; ending head
-	db 0; ending sector + highest 2 bits of end cylinder
-	db 0; ending cylinder
-	dd stage2size+1; relative sector
-	dd fssize; total sectors
-
-part3entry:
-	db 0 ; boot flag
-	db 0; starting head
-	db 0; starting sector + highest 2 bits of start cylinder
-	db 0; starting cylinder
-	db 0; system id
-	db 0; ending head
-	db 0; ending sector + highest 2 bits of end cylinder
-	db 0; ending cylinder
-	dd 0; relative sector
-	dd 0; total sectors
-
-part4entry:
-	db 0 ; boot flag
-	db 0; starting head
-	db 0; starting sector + highest 2 bits of start cylinder
-	db 0; starting cylinder
-	db 0; system id
-	db 0; ending head
-	db 0; ending sector + highest 2 bits of end cylinder
-	db 0; ending cylinder
-	dd 0; relative sector
-	dd 0; total sectors
+times 0x1fe-($-$$) db 0
 
 global magic
 magic:

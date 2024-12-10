@@ -1,5 +1,6 @@
 # things I need to do
- - switch to a better filesystem (FAT32?)
+ - switch to ext2
+ - figure out how to mount the disk image without root permissions
  - implement ATA writing and write to the filesystem
  - implement more syscalls
  - improve shell (add the ability to pass args and stuff like that)
