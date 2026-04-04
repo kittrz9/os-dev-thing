@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 
 #include "serial.h"
 #include "io.h"
@@ -88,6 +89,15 @@ void kernel(void) {
 		puts("reading TODO.md\n\n");
 		printFile("TODO.md");
 	}
+
+	/*static uint8_t buffer[512];
+	readATA(0, 1, (uint16_t*)buffer);
+	strcpy(buffer, "waga baba bobo");
+	writeATA(0, 1, (uint16_t*)buffer);
+
+	memset(buffer, 0, sizeof(buffer));
+	readATA(0, 1, (uint16_t*)buffer);
+	puts(&buffer[0]);*/
 
 	// will eventually do this in a way that isn't garbage
 	if(loadElf("test.elf") == NULL) {

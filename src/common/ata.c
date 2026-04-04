@@ -24,6 +24,10 @@
 #define ATA_STAT_RDY (1 << 6)
 #define ATA_STAT_BSY (1 << 7)
 
+#define ATA_CMD_IDENTIFY 0xec
+#define ATA_CMD_READ_SECTORS 0x20
+#define ATA_CMD_WRITE_SECTORS 0x30
+
 uint8_t pollATA(void) {
 	uint8_t status = inb(ATA_STATUS);
 	while((status & ATA_STAT_BSY) != 0 && (status & ATA_STAT_DRQ) == 0) {
@@ -45,7 +49,7 @@ uint8_t initATA(void) {
 	outb(ATA_LBA_MID, 0x00);
 	outb(ATA_LBA_HI, 0x00);
 
-	outb(ATA_COMMAND, 0xec); // IDENTIFY command
+	outb(ATA_COMMAND, ATA_CMD_IDENTIFY); // IDENTIFY command
 	uint8_t status = inb(ATA_STATUS);
 	if(status == 0) {
 		serialWriteStr("main drive not found\n");
@@ -83,11 +87,44 @@ uint8_t readATA(uint32_t lba, uint8_t count, uint16_t* buf) {
 	outb(ATA_LBA_MID, lba>>8);
 	outb(ATA_LBA_HI, lba>>16);
 
-	outb(ATA_COMMAND, 0x20);
+	outb(ATA_COMMAND, ATA_CMD_READ_SECTORS);
 	pollATA();
 	for(uint16_t block = 0; block < (count==0?256:count); ++block) {
 		for(uint16_t i = 0; i < 256; ++i) {
 			buf[i + block*256] = inw(ATA_DATA);
+		}
+		pollATA();
+	}
+	return 0;
+}
+
+uint8_t writeATA(uint32_t lba, uint8_t count, uint16_t* buf) {
+	if(!ataInitialized) {
+		serialWriteStr("ata not initialized\n");
+		return 1;
+	}
+	
+	if(lba > 0x0fffffff) { 
+		serialWriteStr("lba too big: ");
+		serialWriteHex32(lba);
+		return 1;
+	};
+
+	outb(ATA_DRIVE, 0xe0 | ((lba>>24)&0xf));
+
+	outb(ATA_ERR, 0); // stall
+
+	outb(ATA_SECTOR_COUNT, count);
+	outb(ATA_LBA_LOW, lba);
+	outb(ATA_LBA_MID, lba>>8);
+	outb(ATA_LBA_HI, lba>>16);
+
+	outb(ATA_COMMAND, ATA_CMD_WRITE_SECTORS);
+	pollATA();
+	
+	for(uint16_t block = 0; block < (count==0?256:count); ++block) {
+		for(uint16_t i = 0; i < 256; ++i) {
+			outw(ATA_DATA, buf[i + block*256]);
 		}
 		pollATA();
 	}
