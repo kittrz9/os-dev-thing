@@ -90,6 +90,8 @@ void kernel(void) {
 		printFile("TODO.md");
 	}
 
+	writeFile("ligma", "ligma balls!!!!!", 20);
+	printFile("ligma");
 	/*static uint8_t buffer[512];
 	readATA(0, 1, (uint16_t*)buffer);
 	strcpy(buffer, "waga baba bobo");

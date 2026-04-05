@@ -24,6 +24,8 @@ uint32_t parseOctStr(char* str) {
 uint32_t fsSize = 0;
 uint32_t fsLBA = 0;
 uint32_t indicesLBA;
+uint32_t dataBlocks = 0;
+uint32_t indicesBytes = 0;
 
 void initFS(void) {
 	uint8_t buffer[512];
@@ -41,8 +43,13 @@ void initFS(void) {
 		return;
 	}
 	indicesLBA = fsLBA + fsSize - 1;
-	readATA(indicesLBA, 1, (uint16_t*)buffer);
-	/*serialWriteStr(&buffer[0x1a2]);
+	dataBlocks = *(uint32_t*)(buffer+0x19c);
+	indicesBytes = *(uint32_t*)(buffer+0x1a4);
+	serialWriteStr("data blocks: ");
+	serialWriteHex32(dataBlocks);
+	serialWriteChar('\n');
+	/*readATA(indicesLBA, 1, (uint16_t*)buffer);
+	serialWriteStr(&buffer[0x1a2]);
 	serialWriteChar('\n');*/
 	/*ustarHeader* header = (ustarHeader*)buffer;
 	if(memcmp(header->ustarStr, "ustar", 5) != 0) {
@@ -60,7 +67,9 @@ uint32_t getFileSize(char* name) {
 		return 0;
 	}
 
-	readATA(indicesLBA, 1, (uint16_t*)buffer);
+	uint32_t currentLBA = indicesLBA;
+
+	readATA(currentLBA, 1, (uint16_t*)buffer);
 
 	uint8_t* entry = &buffer[512 - 64];
 
@@ -73,6 +82,11 @@ uint32_t getFileSize(char* name) {
 			}
 		}
 		entry -= 64;
+		if(entry < buffer) {
+			--currentLBA;
+			readATA(currentLBA, 1, (uint16_t*)buffer);
+			entry = &buffer[512-64];
+		}
 	}
 
 	/*for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
@@ -97,11 +111,13 @@ uint8_t readFile(char* name, uint8_t* dest) {
 		return 0;
 	}
 
-	readATA(indicesLBA, 1, (uint16_t*)buffer);
+	uint32_t currentLBA = indicesLBA;
+
+	readATA(currentLBA, 1, (uint16_t*)buffer);
 
 	uint8_t* entry = &buffer[512 - 64];
 
-	while(*entry != 0 && entry >= buffer) {
+	while(*entry != 0) {
 		//serialWriteHex32(*entry);
 		if(*entry == 0x12) {
 			//serialWriteStr(entry+0x22);
@@ -118,6 +134,11 @@ uint8_t readFile(char* name, uint8_t* dest) {
 			}
 		}
 		entry -= 64;
+		if(entry < buffer) {
+			--currentLBA;
+			readATA(currentLBA, 1, (uint16_t*)buffer);
+			entry = &buffer[512-64];
+		}
 	}
 
 	/*for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
@@ -136,3 +157,67 @@ uint8_t readFile(char* name, uint8_t* dest) {
 	return 0;
 }
 
+void writeFile(char* name, uint8_t* fileBuffer, size_t fileSize) {
+	uint8_t buffer[512];
+	if(fsSize == 0) {
+		serialWriteStr("file system not initialized or invalid\n");
+		return;
+	}
+
+	uint32_t currentLBA = indicesLBA;
+
+	readATA(currentLBA, 1, (uint16_t*)buffer);
+
+	uint8_t* entry = &buffer[512 - 64];
+
+	while(*entry != 0) {
+		if(*entry == 0x12) {
+			if(strcmp(entry+0x22, name) == 0) {
+				break;
+			}
+		}
+		entry -= 64;
+		if(entry < buffer) {
+			--currentLBA;
+			readATA(currentLBA, 1, (uint16_t*)buffer);
+			entry = &buffer[512-64];
+		}
+	}
+
+	uint32_t startBlock = 0;
+	uint32_t newBlockCount = fileSize/512 + (fileSize % 512 == 0 ? 0 : 1);
+	if(*entry != 0) {
+		startBlock = *(uint64_t*)(entry+0xa);
+		if(*(uint64_t*)(entry+0x1a) >= fileSize) {
+			writeATA(fsLBA + startBlock, newBlockCount, (uint16_t*)fileBuffer);
+			*(uint64_t*)(entry+0x1a) = fileSize;
+			*(uint64_t*)(entry+0x12) = startBlock + newBlockCount;
+			writeATA(currentLBA, 1, (uint16_t*)buffer);
+			return;
+		}
+	} else {
+		// new file
+		memcpy(entry, entry+64, 64); // copy volume info
+		entry += 64;
+		*entry = 0x12;
+		strcpy(entry+0x22, name);
+	}
+	// ideally should try to find unused space in the data area by like looping over the entries and seeing where files aren't
+	// but this should work for now
+	startBlock = dataBlocks + 1; // counting the superblock
+	dataBlocks += newBlockCount;
+	writeATA(fsLBA + startBlock, newBlockCount, (uint16_t*)fileBuffer);
+
+	// write file info
+	*(uint64_t*)(entry+0x1a) = fileSize;
+	*(uint64_t*)(entry+0xa) = startBlock;
+	*(uint64_t*)(entry+0x12) = startBlock + newBlockCount;
+	writeATA(currentLBA, 1, (uint16_t*)buffer);
+
+	// update superblock
+	readATA(fsLBA, 1, (uint16_t*)buffer);
+	*(uint64_t*)(buffer+0x19c) = dataBlocks;
+	writeATA(fsLBA, 1, (uint16_t*)buffer);
+
+	return;
+}

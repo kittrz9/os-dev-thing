@@ -28,12 +28,13 @@ void listFiles(void) {
 
 	puts("files: \n");
 
+	uint32_t currentLBA = indicesLBA;
 
-	readATA(indicesLBA, 1, (uint16_t*)buffer);
+	readATA(currentLBA, 1, (uint16_t*)buffer);
 
 	uint8_t* entry = &buffer[512 - 64];
 
-	while(*entry != 0 && entry >= buffer) {
+	while(*entry != 0) {
 		//serialWriteHex32(*entry);
 		if(*entry == 0x12) {
 			puts(entry+0x22);
@@ -42,6 +43,11 @@ void listFiles(void) {
 			putc('\n');
 		}
 		entry -= 64;
+		if(entry < buffer) {
+			--currentLBA;
+			readATA(currentLBA, 1, (uint16_t*)buffer);
+			entry = &buffer[512 - 64];
+		}
 	}
 
 	/*for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {

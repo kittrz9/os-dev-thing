@@ -73,7 +73,7 @@ for e in indices:
 			fs[indicesIndex + 0xc + i] = ord(b)
 	indicesIndex -= 64
 
-dataBlocks = int(currentBlock/(2**(blockSize+7)))
+dataBlocks = currentBlock
 # probably a bit dumb to use this format since it has a ton of space reserved for boot code that I'm just not gonna bother with and just have my own boot code elsewhere lmao
 superblock = bytearray(bytes(0x200))
 

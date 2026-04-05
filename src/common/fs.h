@@ -2,6 +2,7 @@
 #define FS_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef struct {
 	char name[100];
@@ -30,6 +31,7 @@ extern uint32_t indicesLBA;
 void initFS(void);
 
 uint8_t readFile(char* name, uint8_t* dest);
+void writeFile(char* name, uint8_t* fileBuffer, size_t fileSize);
 
 uint32_t getFileSize(char* name);
 uint32_t parseOctStr(char* str);
