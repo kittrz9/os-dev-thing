@@ -28,7 +28,23 @@ void listFiles(void) {
 
 	puts("files: \n");
 
-	for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
+
+	readATA(indicesLBA, 1, (uint16_t*)buffer);
+
+	uint8_t* entry = &buffer[512 - 64];
+
+	while(*entry != 0 && entry >= buffer) {
+		//serialWriteHex32(*entry);
+		if(*entry == 0x12) {
+			puts(entry+0x22);
+			puts(", size: ");
+			puts(hex32Str(*(uint32_t*)(entry+0x1a)));
+			putc('\n');
+		}
+		entry -= 64;
+	}
+
+	/*for(uint32_t i = fsLBA; i < fsLBA+fsSize; ++i) {
 		readATA(i, 1, (uint16_t*)buffer);
 		ustarHeader* header = (ustarHeader*)buffer;
 		if(memcmp(header->ustarStr, "ustar", 5) == 0) {
@@ -37,7 +53,7 @@ void listFiles(void) {
 			puts(hex32Str(parseOctStr(header->size)));
 			putc('\n');
 		}
-	}
+	}*/
 
 	return;
 }

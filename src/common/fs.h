@@ -25,6 +25,7 @@ typedef struct {
 
 extern uint32_t fsSize;
 extern uint32_t fsLBA;
+extern uint32_t indicesLBA;
 
 void initFS(void);
 
