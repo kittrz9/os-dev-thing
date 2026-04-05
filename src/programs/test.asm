@@ -2,6 +2,8 @@ bits 32
 
 asdf:
 	db "printing from test.elf!!!", 0xa, 0
+file:
+	db "TODO.md", 0
 global entry
 entry:
 	pushad
@@ -25,10 +27,17 @@ keyCheck:
 	int 0x80
 	jmp keyCheck
 end:
-	mov eax, 0
-	mov dword [esp], 0xa
-	mov ebx, esp
+	;mov eax, 0
+	;mov dword [esp], 0xa
+	;mov ebx, esp
+	;int 0x80
+	mov eax, 4
+	lea ebx, file
 	int 0x80
+	mov eax, 0
+	int 0x80
+	mov eax, 3
+	mov ebx, ecx
 	add esp, 4
 
 
