@@ -118,10 +118,16 @@ char shiftScancodeLUT[] = {
 
 #define KEY_QUEUE_SIZE 32
 char keyQueue[KEY_QUEUE_SIZE];
-uint8_t keyQueuePointer = 0;
+uint8_t keyStartIndex = 0;
+uint8_t keyEndIndex = 0;
 
 char readKey(void) { 
-	// might lead to shenanigans if the keyboard interrupt happens during this function
+	if(keyStartIndex == keyEndIndex) { return '\0'; }
+	char c = keyQueue[keyStartIndex];
+	++keyStartIndex;
+	keyStartIndex %= KEY_QUEUE_SIZE;
+	return c;
+	/*// might lead to shenanigans if the keyboard interrupt happens during this function
 	// could maybe disable the interrrupt with the PIC or just disable interrupts entirely
 	// but I'm not sure if those would have any other consequences
 	char c = keyQueue[0];
@@ -130,7 +136,7 @@ char readKey(void) {
 		keyQueue[i] = keyQueue[i+1];
 	}
 	if(keyQueuePointer != 0) { --keyQueuePointer; }
-	return c;
+	return c;*/
 }
 
 void handleScancode(uint8_t scancode) {
@@ -148,7 +154,7 @@ void handleScancode(uint8_t scancode) {
 		return; 
 	}
 
-	if(keyQueuePointer == KEY_QUEUE_SIZE-1) { serialWriteStr("QUEUE FULL\n"); return; }
+	//if(keyQueuePointer == KEY_QUEUE_SIZE-1) { serialWriteStr("QUEUE FULL\n"); return; }
 
 	if(shift) {
 		c = shiftScancodeLUT[scancode];
@@ -158,8 +164,11 @@ void handleScancode(uint8_t scancode) {
 
 	if(c != '\n' && c != '\b' && c != '\t' && (c < ' ' || c > '~')) { return; }
 
-	keyQueue[keyQueuePointer] = c;
-	++keyQueuePointer;
+	/*keyQueue[keyQueuePointer] = c;
+	++keyQueuePointer;*/
+	keyQueue[keyEndIndex] = c;
+	++keyEndIndex;
+	keyEndIndex %= KEY_QUEUE_SIZE;
 
 	return;
 }
