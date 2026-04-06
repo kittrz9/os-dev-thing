@@ -24,6 +24,21 @@ readKey:
 	je readKey
 	cmp ebx, 0xa
 	je endInput
+	; backspace stuff
+	cmp ebx, 0x8
+	jne notBackspace
+	cmp ecx, 0
+	je readKey
+	dec edi
+	dec esp
+	mov byte [esp], 0x8
+	mov eax, 0
+	mov ebx, esp
+	mov ecx, 1
+	int 0x80
+	inc esp
+	jmp readKey
+notBackspace:
 	mov byte [edi], bl
 	push ecx
 	mov eax, 0
@@ -48,6 +63,10 @@ endInput:
 	mov eax, 4
 	mov ebx, fileName
 	int 0x80
+	cmp ebx, 0
+	jne fileFound
+	ret
+fileFound:
 	mov dword [fileSize], ecx
 	mov dword [fileBuffer], ebx
 
@@ -83,7 +102,6 @@ hexdumpLoop:
 	mov ebx, dword [fileSize]
 	int 0x80
 
-	mov byte [edi], 0
 	dec esp
 	mov byte [esp], 0xa
 	mov eax, 0
