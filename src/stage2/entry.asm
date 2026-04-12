@@ -18,5 +18,6 @@ entry:
 	xor eax, eax
 bssInitLoop:
 	mov dword[edi], eax
+	add edi, 4
 	loop bssInitLoop
 	jmp stage2
