@@ -99,7 +99,8 @@ hexdumpLoop:
 
 	; free
 	mov eax, 3
-	mov ebx, dword [fileSize]
+	mov ebx, dword [fileBuffer]
+	mov ecx, dword [fileSize]
 	int 0x80
 
 	dec esp

@@ -1,9 +1,9 @@
 #ifndef PAGEALLOC_H
 #define PAGEALLOC_H
 
-#include <stdint.h>
+#include <stddef.h>
 
-void* pageAlloc(uint32_t bytes);
-void pageFree(uint32_t bytes);
+void* pageAlloc(size_t bytes);
+void pageFree(void* p, size_t bytes);
 
 #endif

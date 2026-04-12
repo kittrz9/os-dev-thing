@@ -6,16 +6,17 @@
 #include "pageAlloc.h"
 #include "paging.h"
 
-size_t elfAllocatedPages;
+size_t elfSize;
+void* elfBuffer;
 void (*loadedElfEntry)(void);
 
 void* loadElf(char* fileName) {
-	uint32_t fileSize = getFileSize(fileName);
+	elfSize = getFileSize(fileName);
 	if(fileSize == 0) {
 		return NULL;
 	}
-	elfAllocatedPages = fileSize;
 	uint8_t* buffer = pageAlloc(fileSize); 
+	elfBuffer = buffer;
 	readFile(fileName, buffer);
 	elfFileHeader* elfHeader = (elfFileHeader*)buffer;
 	elfProgramHeader* pHeaders = (elfProgramHeader*)(buffer + elfHeader->programHeadersOffset);
@@ -33,5 +34,5 @@ void launchElf(void) {
 }
 
 void freeElf(void) {
-	pageFree(elfAllocatedPages);
+	pageFree(elfBuffer, elfSize);
 }

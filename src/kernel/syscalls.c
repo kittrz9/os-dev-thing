@@ -30,7 +30,7 @@ uint32_t* handleSyscalls(uint32_t regs[6]) {
 			regs[1] = (uint32_t)pageAlloc(regs[1]);
 			break;
 		case 3:
-			pageFree(regs[1]);
+			pageFree((void*)regs[1], regs[2]);
 			break;
 		case 4:
 			size_t fileSize = getFileSize((char*)regs[1]);
