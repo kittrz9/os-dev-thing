@@ -12,10 +12,10 @@ void (*loadedElfEntry)(void);
 
 void* loadElf(char* fileName) {
 	elfSize = getFileSize(fileName);
-	if(fileSize == 0) {
+	if(elfSize == 0) {
 		return NULL;
 	}
-	uint8_t* buffer = pageAlloc(fileSize); 
+	uint8_t* buffer = pageAlloc(elfSize); 
 	elfBuffer = buffer;
 	readFile(fileName, buffer);
 	elfFileHeader* elfHeader = (elfFileHeader*)buffer;

@@ -15,6 +15,7 @@ entry:
 	mov edi, bssStart
 	mov ecx, bssEnd
 	sub ecx, bssStart ; just doing bssEnd-bssStart doesn't work, probably could get the linker to define the size of the bss section but who cares
+	shr ecx, 2 ; forgot to divide by 4 lmao
 	xor eax, eax
 bssInitLoop:
 	mov dword[edi], eax
