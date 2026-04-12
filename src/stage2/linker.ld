@@ -16,11 +16,12 @@ SECTIONS {
 	.data : {
 		*(.data);
 	}
+
+	bssStart = ALIGN(4);
 	.bss : {
 		*(.bss);
 	}
-	stage2End = .;
-	endPage = ALIGN(4K);
+	bssEnd = ALIGN(4);
 
 	/DISCARD/ : {
 		*(.debug_info)

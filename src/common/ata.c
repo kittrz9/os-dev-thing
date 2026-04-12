@@ -40,7 +40,7 @@ uint8_t pollATA(void) {
 	return 0;
 }
 
-uint8_t ataInitialized = 1;
+uint8_t ataInitialized;
 
 uint8_t initATA(void) {
 	outb(ATA_DRIVE, 0xe0);
@@ -62,6 +62,7 @@ uint8_t initATA(void) {
 		inb(ATA_DATA); // discarding the info for now
 	}
 
+	ataInitialized = 1;
 	return 0;
 }
 

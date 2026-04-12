@@ -8,24 +8,11 @@
 // https://wiki.osdev.org/SFS
 // https://web.archive.org/web/20090923015653/http://dimensionalrift.homelinux.net/combuster/vdisk/sfs.html#Super-Block
 
-uint32_t parseOctStr(char* str) {
-	uint32_t value = 0;
-	size_t len = strlen(str);
-	char* c = str;
-	while(len-- > 0) {
-		value *= 8;
-		value += *c - '0';
-		++c;
-	}
-	return value;
-}
-
-// having these get put into bss made them unitialized, I should probably init bss to 0 myself but whatever this works for now
-uint32_t fsSize = 0;
-uint32_t fsLBA = 0;
+uint32_t fsSize;
+uint32_t fsLBA;
 uint32_t indicesLBA;
-uint32_t dataBlocks = 0;
-uint32_t indicesBytes = 0;
+uint32_t dataBlocks;
+uint32_t indicesBytes;
 
 void initFS(void) {
 	uint8_t buffer[512];
