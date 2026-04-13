@@ -157,7 +157,7 @@ void writeFile(char* name, uint8_t* fileBuffer, size_t fileSize) {
 
 	uint8_t* entry = &buffer[512 - 64];
 
-	while(*entry != 0) {
+	while(*entry != 0 && *entry != 1) {
 		if(*entry == 0x12) {
 			if(strcmp(entry+0x22, name) == 0) {
 				break;
@@ -173,7 +173,23 @@ void writeFile(char* name, uint8_t* fileBuffer, size_t fileSize) {
 
 	uint32_t startBlock = 0;
 	uint32_t newBlockCount = fileSize/512 + (fileSize % 512 == 0 ? 0 : 1);
-	if(*entry != 0) {
+	if(*entry == 1) {
+		// honestly not sure why I'm bothering with the volume info stuff
+		// I could probably just make a filesystem similar to sfs without most of the stuff to simplify things even more
+		// since I'm not gonna use most of it lmao
+		if(entry == buffer) {
+			uint8_t volumeInfo[64];
+			memcpy(volumeInfo, entry, 64);
+			readATA(currentLBA-1, 1, (uint16_t*)buffer);
+			memcpy(&buffer[512-64], volumeInfo, 64);
+			writeATA(currentLBA-1, 1, (uint16_t*)buffer);
+			readATA(currentLBA, 1, (uint16_t*)buffer);
+		} else {
+			memcpy(entry - 64, entry, 64);
+		}
+		*entry = 0x12;
+		strcpy(entry+0x22, name);
+	} else {
 		startBlock = *(uint64_t*)(entry+0xa);
 		if(*(uint64_t*)(entry+0x1a) >= fileSize) {
 			writeATA(fsLBA + startBlock, newBlockCount, (uint16_t*)fileBuffer);
@@ -182,12 +198,6 @@ void writeFile(char* name, uint8_t* fileBuffer, size_t fileSize) {
 			writeATA(currentLBA, 1, (uint16_t*)buffer);
 			return;
 		}
-	} else {
-		// new file
-		memcpy(entry, entry+64, 64); // copy volume info
-		entry += 64;
-		*entry = 0x12;
-		strcpy(entry+0x22, name);
 	}
 	// ideally should try to find unused space in the data area by like looping over the entries and seeing where files aren't
 	// but this should work for now

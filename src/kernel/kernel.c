@@ -92,6 +92,11 @@ void kernel(void) {
 
 	writeFile("ligma", "ligma balls!!!!!", 20);
 	printFile("ligma");
+	/*writeFile("1", "1", 1);
+	writeFile("2", "2", 2);
+	writeFile("3", "3", 3);
+	writeFile("4", "4", 4);
+	writeFile("5", "5", 5);*/
 	/*static uint8_t buffer[512];
 	readATA(0, 1, (uint16_t*)buffer);
 	strcpy(buffer, "waga baba bobo");
