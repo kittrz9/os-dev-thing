@@ -14,9 +14,19 @@ for f in $CFILES; do
 		mkdir -p "$OBJDIR"
 	fi
 
-	$CC $CFLAGS $DEFINES -D STAGE2 $INCLUDES -o "$OBJNAME" -c "$f"
 
 	OBJS="$OBJNAME $OBJS"
+
+	if [ -f "$OBJNAME" ]; then
+		OBJTIME="$(stat "$OBJNAME" -c %Y)"
+		SRCTIME="$(stat "$f" -c %Y)"
+		if [ $SRCTIME -lt $OBJTIME ]; then
+			continue
+		fi
+	fi
+
+
+	$CC $CFLAGS $DEFINES -D STAGE2 $INCLUDES -o "$OBJNAME" -c "$f"
 done
 
 ASMFILES="$(find src/stage2/ -name "*.asm")"
@@ -29,10 +39,20 @@ for f in $ASMFILES; do
 		mkdir -p "$OBJDIR"
 	fi
 
+	OBJS="$OBJNAME $OBJS"
+
+	if [ -f "$OBJNAME" ]; then
+		OBJTIME="$(stat "$OBJNAME" -c %Y)"
+		SRCTIME="$(stat "$f" -c %Y)"
+		if [ $SRCTIME -lt $OBJTIME ]; then
+			continue
+		fi
+	fi
+
+
 	#$CC $CFLAGS $DEFINES $INCLUDES -o "$OBJNAME" -c "$f"
 	nasm -felf32 "$f" -o "$OBJNAME"
 
-	OBJS="$OBJNAME $OBJS"
 done
 
 echo $OBJS

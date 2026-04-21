@@ -22,8 +22,14 @@ LDFLAGS="$LDFLAGS -O2 -nostdlib -static --no-dynamic-linker -z max-page-size=0x1
 INCLUDES="$INCLUDES -Isrc/common"
 DEFINES="$DEFINES "
 
-rm -rf build/ obj/
-mkdir -p build/ obj/
+if [ ! -d build/ ]; then
+	mkdir -p build/
+fi
+if [ ! -d obj/ ]; then
+	mkdir -p obj/
+fi
+#rm -rf build/ obj/
+#mkdir -p build/ obj/
 
 OBJS=""
 

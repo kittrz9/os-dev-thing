@@ -6,7 +6,7 @@ import struct
 blockSize = 2 # 512 bytes
 blockSizeBytes = 512 #2**(blockSize + 7)
 
-totalBlocks = 0x50
+totalBlocks = 0x100
 fsSize = blockSizeBytes * totalBlocks
 
 includedFiles = [
@@ -101,7 +101,7 @@ checksum = 0
 for x in superblock[0x1ac:0x1bd]:
 	checksum += x
 checksum &= 0xff
-superblock[0x1bd] = 0x100 - checksum
+superblock[0x1bd] = (0x100 - checksum)&0xff
 
 
 with open("build/fs.bin", "wb") as f:

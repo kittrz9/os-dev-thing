@@ -2,7 +2,9 @@
 
 cd "$ORIGIN_DIR"
 
-mkdir "$ORIGIN_DIR"/build/programs
+if [ ! -d "$ORIGIN_DIR"/build/programs ]; then
+	mkdir -p "$ORIGIN_DIR"/build/programs
+fi
 
 PROGRAMS="$(find src/programs/ -name "*.asm")"
 for f in $PROGRAMS; do
@@ -10,6 +12,7 @@ for f in $PROGRAMS; do
 	PROGRAM_OBJ="$(echo $PROGRAM_OUT | sed -e "s/\.elf/\.o/")"
 
 	nasm -felf32 "$f" -o "$PROGRAM_OBJ"
+
 
 	$LD $PROGRAM_OBJ $LDFLAGS -T src/programs/linker.ld -o $PROGRAM_OUT
 done

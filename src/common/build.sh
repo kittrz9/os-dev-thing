@@ -12,6 +12,15 @@ for f in $CFILES; do
 		mkdir -p "$OBJDIR"
 	fi
 
+	if [ -f "$OBJNAME" ]; then
+		OBJTIME="$(stat "$OBJNAME" -c %Y)"
+		SRCTIME="$(stat "$f" -c %Y)"
+		if [ $SRCTIME -lt $OBJTIME ]; then
+			continue
+		fi
+	fi
+
+
 	$CC $CFLAGS $DEFINES $INCLUDES -o "$OBJNAME" -c "$f"
 
 	OBJS="$OBJNAME $OBJS"
@@ -26,6 +35,15 @@ for f in $ASMFILES; do
 	if [ ! -d "$OBJDIR" ]; then
 		mkdir -p "$OBJDIR"
 	fi
+
+	if [ -f "$OBJNAME" ]; then
+		OBJTIME="$(stat "$OBJNAME" -c %Y)"
+		SRCTIME="$(stat "$f" -c %Y)"
+		if [ $SRCTIME -lt $OBJTIME ]; then
+			continue
+		fi
+	fi
+
 
 	#$CC $CFLAGS $DEFINES $INCLUDES -o "$OBJNAME" -c "$f"
 	nasm -felf32 "$f" -o "$OBJNAME"
