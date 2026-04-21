@@ -169,9 +169,60 @@ listMode:
 
 	ret
 
+
+
+fileBufferPtr:
+	dq 0
+
+writeMode:
+	mov eax, 2 ; alloc
+	mov ebx, MAX_LINES*(MAX_LINE_LENGTH+1)
+	int 0x80
+	mov dword [fileBufferPtr], ebx
+
+	mov edi, ebx
+	mov edx, dword [linesPtr]
+nextLine:
+	mov al, byte [edx] ; first char
+	cmp al, 0
+	je fileEnd
+	mov esi, edx
+
+nextChar:
+	mov al, byte [esi]
+	cmp al, 0
+	jne notNextLine
+	add edx, MAX_LINE_LENGTH+1
+	mov byte [edi], 0xa
+	inc edi
+	jmp nextLine
+notNextLine:
+	mov byte [edi], al
+
+	inc edi
+	inc esi
+	jmp nextChar
+fileEnd:
+
+	mov ecx, edi
+	sub ecx, dword [fileBufferPtr]
+
+
+	mov eax, 5 ; write
+	mov ebx, lineBuffer+1
+	mov edx, ecx ; probably should change the syscall take the size from ecx
+	mov ecx, dword [fileBufferPtr]
+	int 0x80
+
+
+	mov eax, 3 ; free
+	mov ebx, dword [linesPtr]
+	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
+	ret
+
 global entry
 entry:
-	mov eax, 2
+	mov eax, 2 ; alloc
 	mov ebx, MAX_LINES*(MAX_LINE_LENGTH+1)
 	int 0x80
 	mov dword [linesPtr], ebx
@@ -194,6 +245,11 @@ notInsertMode:
 	call listMode
 notListMode:
 
+	cmp al, 'w'
+	jne notWriteMode
+	call writeMode
+notWriteMode:
+
 	cmp al, '0'
 	jl notNumber
 	cmp al, '9'
@@ -214,7 +270,7 @@ notNumber:
 	mov byte [lineBuffer], al
 	jmp mainLoop
 quit:
-	mov eax, 3
+	mov eax, 3 ; free
 	mov ebx, dword [linesPtr]
 	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
 	ret
