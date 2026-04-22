@@ -221,7 +221,7 @@ fileEnd:
 	int 0x80
 
 	mov eax, 3 ; free
-	mov ebx, dword [linesPtr]
+	mov ebx, dword [fileBufferPtr]
 	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
 	ret
 
