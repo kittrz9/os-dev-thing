@@ -79,24 +79,23 @@ readChar:
 	cmp ebx, 0xa
 	je endInput
 
-	cmp ecx, MAX_LINE_LENGTH
-	jge readChar
-
-	mov al, bl
-	call printChar
-
 	cmp bl, 0x8 ; backspace
 	jne notBackspace
 	cmp ecx, 0
 	je readChar
+	mov al, bl
+	call printChar
 	dec ecx
 	mov byte [edi], 0
-	inc edi
+	dec edi
 	mov dword [lineBufferIndex], ecx
 	jmp readChar
 notBackspace:
 	cmp ecx, MAX_LINE_LENGTH
 	jge readChar
+
+	mov al, bl
+	call printChar
 
 	mov byte [edi], bl
 	inc ecx
