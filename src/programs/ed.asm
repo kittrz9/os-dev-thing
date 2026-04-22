@@ -6,17 +6,17 @@ bits 32
 ;lines:
 ;	resb MAX_LINES*(MAX_LINE_LENGTH+1)
 linesPtr:
-	dq 0
+	dd 0
 currentLine:
-	dq 0
+	dd 0
 lastLine:
-	dq 0
+	dd 0
 
 ; will be used for commands too
 lineBuffer:
 	resb MAX_LINE_LENGTH+1
 lineBufferIndex:
-	dq 0
+	dd 0
 
 printChar:
 	push ebx
@@ -59,8 +59,7 @@ parseDecimalLoop:
 	add eax, ebx
 
 	cmp edi, esi
-	je parseDecimalEnd
-	jmp parseDecimalLoop
+	jne parseDecimalLoop
 parseDecimalEnd:
 	ret
 
@@ -135,12 +134,6 @@ insertModeLoop:
 	mov byte [edi], 0
 	pop edi
 
-;	mov eax, 0
-;	mov ebx, edi
-;	int 0x80
-;	mov al, 0xa
-;	call printChar
-
 	mov ecx, dword [currentLine]
 	cmp ecx, dword [lastLine]
 	jle notLastLine
@@ -176,7 +169,7 @@ listMode:
 
 
 fileBufferPtr:
-	dq 0
+	dd 0
 
 writeMode:
 	mov eax, 2 ; alloc
@@ -212,7 +205,6 @@ fileEnd:
 	mov ecx, edi
 	sub ecx, dword [fileBufferPtr]
 
-
 	mov eax, 5 ; write
 	mov ebx, lineBuffer+1
 	mov edx, ecx ; probably should change the syscall take the size from ecx
@@ -222,6 +214,7 @@ fileEnd:
 	mov eax, 3 ; free
 	mov ebx, dword [fileBufferPtr]
 	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
+	int 0x80
 	ret
 
 
@@ -272,13 +265,6 @@ notWriteMode:
 	mov dword [currentLine], eax
 notNumber:
 
-;	mov eax, 0 ; print
-;	mov ebx, lineBuffer
-;	mov ecx, dword [lineBufferIndex]
-;	int 0x80
-;	mov al, 0xa
-;	call printChar
-
 	mov al, 0
 	mov byte [lineBuffer], al
 	jmp mainLoop
@@ -286,4 +272,5 @@ quit:
 	mov eax, 3 ; free
 	mov ebx, dword [linesPtr]
 	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
+	int 0x80
 	ret
