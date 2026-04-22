@@ -12,6 +12,9 @@ currentLine:
 lastLine:
 	dd 0
 
+selectionEnd: ; probably needs a better name
+	dd 0
+
 ; will be used for commands too
 lineBuffer:
 	resb MAX_LINE_LENGTH+1
@@ -37,7 +40,6 @@ printChar:
 
 
 parseDecimal:
-	mov edi, esi
 	mov eax, 0
 	mov ecx, 10
 parseDecimalLoop:
@@ -150,13 +152,29 @@ listMode:
 	mov ecx, MAX_LINE_LENGTH+1
 	mul ecx
 	add edi, eax
+
+	mov ecx, dword [currentLine]
+listModeLoop:
+	cmp ecx, dword [selectionEnd]
+	jg listModeEnd
+	cmp ecx, dword [lastLine]
+	jg listModeEnd
+
+	push ecx
 	mov eax, 0
 	mov ebx, edi
 	mov ecx, 0
 	int 0x80
+	pop ecx
 
 	mov al, 0xa
 	call printChar
+
+	inc ecx
+	add edi, MAX_LINE_LENGTH+1
+
+	jmp listModeLoop
+listModeEnd:
 
 	ret
 
@@ -171,6 +189,7 @@ writeMode:
 	int 0x80
 	mov dword [fileBufferPtr], ebx
 
+	push esi
 	mov edi, ebx
 	mov edx, dword [linesPtr]
 	mov ecx, 0
@@ -195,12 +214,13 @@ notNextLine:
 	inc esi
 	jmp nextChar
 fileEnd:
+	pop esi
 
 	mov ecx, edi
 	sub ecx, dword [fileBufferPtr]
 
 	mov eax, 5 ; write
-	mov ebx, lineBuffer+1
+	mov ebx, esi
 	mov edx, ecx ; probably should change the syscall take the size from ecx
 	mov ecx, dword [fileBufferPtr]
 	int 0x80
@@ -242,7 +262,19 @@ mainLoop:
 	mov dword [currentLine], eax
 notNumber:
 
+	mov eax, dword [currentLine]
+	mov dword [selectionEnd], eax
 	mov al, byte[esi]
+	cmp al, ','
+	jne noSelectionEnd ; needs a better name
+
+	inc esi
+	call parseDecimal
+	mov dword [selectionEnd], eax
+noSelectionEnd:
+
+	mov al, byte[esi]
+	inc esi
 
 	cmp al, 'q'
 	je quit
