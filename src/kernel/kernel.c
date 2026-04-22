@@ -90,8 +90,8 @@ void kernel(void) {
 		printFile("TODO.md");
 	}
 
-	writeFile("ligma", "ligma balls!!!!!", 20);
-	printFile("ligma");
+	/*writeFile("ligma", "ligma balls!!!!!", 20);
+	printFile("ligma");*/
 	/*writeFile("1", "1", 1);
 	writeFile("2", "2", 2);
 	writeFile("3", "3", 3);
@@ -107,12 +107,12 @@ void kernel(void) {
 	puts(&buffer[0]);*/
 
 	// will eventually do this in a way that isn't garbage
-	if(loadElf("test.elf") == NULL) {
+	/*if(loadElf("test.elf") == NULL) {
 		serialWriteStr("could not find test.elf");
 	} else {
 		launchElf();
 		freeElf();
-	}
+	}*/
 	
 	while(1) {
 		runShell();

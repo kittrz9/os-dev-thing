@@ -38,30 +38,24 @@ printChar:
 
 parseDecimal:
 	mov edi, esi
-findDecimalEnd:
-	mov al, byte [edi]
-	cmp al, '0'
-	jl decimalEndFound
-	cmp al, '9'
-	jg decimalEndFound
-	inc edi
-	jmp findDecimalEnd
-decimalEndFound: ; needs a better name
-
 	mov eax, 0
 	mov ecx, 10
 parseDecimalLoop:
-	dec edi
+	movzx ebx, byte [esi]
+	cmp bl, '0'
+	jl parseDecimalEnd
+	cmp bl, '9'
+	jg parseDecimalEnd
+
 	mul ecx
 
-	movzx ebx, byte [edi]
 	sub ebx, '0'
 	add eax, ebx
-
-	cmp edi, esi
-	jne parseDecimalLoop
+	inc esi
+	jmp parseDecimalLoop
 parseDecimalEnd:
 	ret
+
 
 
 readLine:
@@ -237,7 +231,19 @@ mainLoop:
 	mov al, 0xa
 	call printChar
 
-	mov al, byte[lineBuffer]
+	mov esi, lineBuffer
+	mov al, byte[esi]
+
+	cmp al, '0'
+	jl notNumber
+	cmp al, '9'
+	jg notNumber
+	call parseDecimal
+	mov dword [currentLine], eax
+notNumber:
+
+	mov al, byte[esi]
+
 	cmp al, 'q'
 	je quit
 
@@ -255,15 +261,6 @@ notListMode:
 	jne notWriteMode
 	call writeMode
 notWriteMode:
-
-	cmp al, '0'
-	jl notNumber
-	cmp al, '9'
-	jg notNumber
-	mov esi, lineBuffer
-	call parseDecimal
-	mov dword [currentLine], eax
-notNumber:
 
 	mov al, 0
 	mov byte [lineBuffer], al
