@@ -1,6 +1,6 @@
 bits 32
 
-%define MAX_LINES 256
+%define MAX_LINES 1024
 %define MAX_LINE_LENGTH 64
 
 ;lines:
@@ -8,6 +8,8 @@ bits 32
 linesPtr:
 	dq 0
 currentLine:
+	dq 0
+lastLine:
 	dq 0
 
 ; will be used for commands too
@@ -121,10 +123,8 @@ insertModeLoop:
 	jge insertModeEnd
 
 	call readLine
-	push eax
 	mov al, 0xa
 	call printChar
-	pop eax
 
 	mov al, byte [lineBuffer]
 	cmp al, '.'
@@ -133,6 +133,7 @@ insertModeLoop:
 	mov esi, lineBuffer
 	push edi
 	rep movsb
+	mov byte [edi], 0
 	pop edi
 
 ;	mov eax, 0
@@ -142,6 +143,10 @@ insertModeLoop:
 ;	call printChar
 
 	mov ecx, dword [currentLine]
+	cmp ecx, dword [lastLine]
+	jle notLastLine
+	mov dword [lastLine], ecx
+notLastLine:
 	inc ecx
 	mov dword [currentLine], ecx
 
@@ -182,10 +187,10 @@ writeMode:
 
 	mov edi, ebx
 	mov edx, dword [linesPtr]
+	mov ecx, 0
 nextLine:
-	mov al, byte [edx] ; first char
-	cmp al, 0
-	je fileEnd
+	cmp ecx, dword [lastLine]
+	jg fileEnd
 	mov esi, edx
 
 nextChar:
@@ -195,6 +200,7 @@ nextChar:
 	add edx, MAX_LINE_LENGTH+1
 	mov byte [edi], 0xa
 	inc edi
+	inc ecx
 	jmp nextLine
 notNextLine:
 	mov byte [edi], al
@@ -214,11 +220,12 @@ fileEnd:
 	mov ecx, dword [fileBufferPtr]
 	int 0x80
 
-
 	mov eax, 3 ; free
 	mov ebx, dword [linesPtr]
 	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
 	ret
+
+
 
 global entry
 entry:
@@ -226,6 +233,13 @@ entry:
 	mov ebx, MAX_LINES*(MAX_LINE_LENGTH+1)
 	int 0x80
 	mov dword [linesPtr], ebx
+
+	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
+bufferInit:
+	mov byte [ebx], 0
+	inc ebx
+	loop bufferInit
+
 mainLoop:
 	call readLine
 	mov al, 0xa
