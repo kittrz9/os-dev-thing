@@ -21,6 +21,21 @@ lineBuffer:
 lineBufferIndex:
 	dd 0
 
+clearLineBuffer:
+	push ebx
+	push ecx
+
+	mov ebx, dword [linesPtr]
+	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
+clearLineBufferLoop:
+	mov byte [ebx], 0
+	inc ebx
+	loop clearLineBufferLoop
+
+	pop ecx
+	pop ebx
+	ret
+
 printChar:
 	push ebx
 	push ecx
@@ -146,7 +161,7 @@ insertModeEnd:
 
 
 
-listMode:
+printMode:
 	mov edi, dword [linesPtr]
 	mov eax, dword [currentLine]
 	mov ecx, MAX_LINE_LENGTH+1
@@ -154,11 +169,11 @@ listMode:
 	add edi, eax
 
 	mov ecx, dword [currentLine]
-listModeLoop:
+printModeLoop:
 	cmp ecx, dword [selectionEnd]
-	jg listModeEnd
+	jg printModeEnd
 	cmp ecx, dword [lastLine]
-	jg listModeEnd
+	jg printModeEnd
 
 	push ecx
 	mov eax, 0
@@ -173,14 +188,16 @@ listModeLoop:
 	inc ecx
 	add edi, MAX_LINE_LENGTH+1
 
-	jmp listModeLoop
-listModeEnd:
+	jmp printModeLoop
+printModeEnd:
 
 	ret
 
 
 
 fileBufferPtr:
+	dd 0
+fileBufferSize:
 	dd 0
 
 writeMode:
@@ -232,6 +249,46 @@ fileEnd:
 	ret
 
 
+loadMode: ; should probably stop calling these modes
+	call clearLineBuffer
+	mov eax, 4 ; load file
+	mov ebx, esi
+	int 0x80
+	mov dword [fileBufferPtr], ebx
+	mov dword [fileBufferSize], ecx
+
+	mov edi, dword [linesPtr]
+	mov edx, edi
+	mov esi, ebx
+	mov ebx, 0
+loadModeLoop:
+	mov al, byte [esi]
+	inc esi
+	cmp al, 0xa
+	je loadNextLine
+	mov byte [edi], al
+	inc edi
+	dec ecx
+	jnz loadModeLoop
+	jmp loadLineEnd
+
+loadNextLine:
+	add edx, MAX_LINE_LENGTH+1
+	mov edi, edx
+	inc ebx
+	cmp ebx, MAX_LINES
+	jl loadModeLoop
+loadLineEnd:
+
+	mov dword [lastLine], ebx
+
+
+	mov eax, 3 ; free
+	mov ebx, dword [fileBufferPtr]
+	mov ecx, dword [fileBufferSize]
+	int 0x80
+	ret
+
 
 global entry
 entry:
@@ -240,11 +297,7 @@ entry:
 	int 0x80
 	mov dword [linesPtr], ebx
 
-	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
-bufferInit:
-	mov byte [ebx], 0
-	inc ebx
-	loop bufferInit
+	call clearLineBuffer
 
 mainLoop:
 	call readLine
@@ -284,15 +337,20 @@ noSelectionEnd:
 	call insertMode
 notInsertMode:
 
-	cmp al, 'l'
-	jne notListMode
-	call listMode
-notListMode:
+	cmp al, 'p'
+	jne notPrintMode
+	call printMode
+notPrintMode:
 
 	cmp al, 'w'
 	jne notWriteMode
 	call writeMode
 notWriteMode:
+
+	cmp al, 'l'
+	jne notLoadMode
+	call loadMode
+notLoadMode:
 
 	mov al, 0
 	mov byte [lineBuffer], al
