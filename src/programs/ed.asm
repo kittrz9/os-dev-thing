@@ -21,19 +21,41 @@ lineBuffer:
 lineBufferIndex:
 	dd 0
 
-clearLineBuffer:
+clearAllLines:
 	push ebx
 	push ecx
 
 	mov ebx, dword [linesPtr]
 	mov ecx, MAX_LINES*(MAX_LINE_LENGTH+1)
-clearLineBufferLoop:
+clearAllLinesLoop:
 	mov byte [ebx], 0
 	inc ebx
-	loop clearLineBufferLoop
+	loop clearAllLinesLoop
 
 	pop ecx
 	pop ebx
+	ret
+
+
+clearLine:
+	push eax
+	push ebx
+	push ecx
+
+	mov ebx, dword [linesPtr]
+	mov eax, MAX_LINE_LENGTH+1
+	mov ecx, dword [currentLine]
+	mul ecx
+	add ebx, ecx
+	mov ecx, MAX_LINE_LENGTH+1
+
+clearLineLoop:
+	mov byte [ebx], 0
+	loop clearLineLoop
+
+	pop ecx
+	pop ebx
+	pop eax
 	ret
 
 printChar:
@@ -250,7 +272,7 @@ fileEnd:
 
 
 loadMode: ; should probably stop calling these modes
-	call clearLineBuffer
+	call clearAllLines
 	mov eax, 4 ; load file
 	mov ebx, esi
 	int 0x80
@@ -290,6 +312,41 @@ loadLineEnd:
 	ret
 
 
+; doesn't actually delete multiple lines yet lmao
+deleteMode:
+	mov eax, dword [lastLine]
+	cmp eax, 0
+	jne deleteModeNotLastLine
+	call clearLine
+	jmp deleteModeEnd
+deleteModeNotLastLine:
+	dec eax
+	mov dword [lastLine], eax
+
+	mov edi, dword [linesPtr]
+
+	mov eax, MAX_LINE_LENGTH+1
+	mov ebx, dword [currentLine]
+	mul ebx
+	add edi, eax
+
+	mov esi, edi
+	add esi, MAX_LINE_LENGTH+1
+
+	mov edx, dword [selectionEnd]
+	sub edx, dword [currentLine]
+
+	mov eax, dword [lastLine]
+	sub eax, dword [currentLine]
+	inc eax
+	mov ebx, MAX_LINE_LENGTH+1
+	mul ebx
+	mov ecx, eax
+	rep movsb
+
+deleteModeEnd:
+	ret
+
 global entry
 entry:
 	mov eax, 2 ; alloc
@@ -297,7 +354,7 @@ entry:
 	int 0x80
 	mov dword [linesPtr], ebx
 
-	call clearLineBuffer
+	call clearAllLines
 
 mainLoop:
 	call readLine
@@ -351,6 +408,11 @@ notWriteMode:
 	jne notLoadMode
 	call loadMode
 notLoadMode:
+
+	cmp al, 'd'
+	jne notDeleteMode
+	call deleteMode
+notDeleteMode:
 
 	mov al, 0
 	mov byte [lineBuffer], al
