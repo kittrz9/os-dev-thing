@@ -273,9 +273,14 @@ fileEnd:
 
 loadMode: ; should probably stop calling these modes
 	call clearAllLines
+	mov dword [lastLine], 0
 	mov eax, 4 ; load file
 	mov ebx, esi
 	int 0x80
+	cmp ebx, 0
+	jne fileLoaded
+	ret
+fileLoaded:
 	mov dword [fileBufferPtr], ebx
 	mov dword [fileBufferSize], ecx
 
@@ -373,6 +378,9 @@ mainLoop:
 notNumber:
 
 	mov eax, dword [currentLine]
+	cmp eax, dword [lastLine]
+	cmovg eax, dword [lastLine]
+	mov dword [currentLine], eax
 	mov dword [selectionEnd], eax
 	mov al, byte[esi]
 	cmp al, ','
