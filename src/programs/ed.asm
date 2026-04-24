@@ -46,7 +46,7 @@ clearLine:
 	mov eax, MAX_LINE_LENGTH+1
 	mov ecx, dword [currentLine]
 	mul ecx
-	add ebx, ecx
+	add ebx, eax
 	mov ecx, MAX_LINE_LENGTH+1
 
 clearLineLoop:

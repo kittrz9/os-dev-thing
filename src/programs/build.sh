@@ -16,3 +16,13 @@ for f in $PROGRAMS; do
 
 	$LD $PROGRAM_OBJ $LDFLAGS -T src/programs/linker.ld -o $PROGRAM_OUT
 done
+
+C_PROGRAMS="$(find src/programs/ -name "*.c")"
+for f in $C_PROGRAMS; do
+	PROGRAM_OUT="$ORIGIN_DIR"/build/programs/"$(basename "$f" | sed -e "s/\.c/\.elf/")"
+	PROGRAM_OBJ="$(echo $PROGRAM_OUT | sed -e "s/\.elf/\.o/")"
+
+	$CC $CFLAGS $DEFINES -D KERNEL $INCLUDES -o "$PROGRAM_OBJ" -c "$f"
+
+	$LD $PROGRAM_OBJ $LDFLAGS -T src/programs/linker.ld -o $PROGRAM_OUT
+done
