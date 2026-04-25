@@ -34,21 +34,6 @@ void sysWriteFile(char* fileName, uint32_t size, void* buffer) {
 	__asm__ volatile("int $0x80" : : "a" (5), "b" (fileName), "c" (buffer), "d" (size) : "memory");
 }
 
-struct {
-	char* name;
-	uint8_t* bytes;
-	uint32_t byteCount;
-	uint8_t argCount; // need to figure out how I should handle args
-} instructions[] = {
-	{ "ret", (uint8_t[]){ 0xc3 }, 1, 0},
-	{ "cli", (uint8_t[]){ 0xfa }, 1, 0},
-	{ "hlt", (uint8_t[]){ 0xf4 }, 1, 0},
-	{ "sti", (uint8_t[]){ 0xfb }, 1, 0},
-	// dealing with stuff like all the mov varients seems horrible lmao
-	// could maybe have multiple arrays of instructions that each take specific arguments and only iterate through those when parsing them
-};
-
-
 // stuff in bss probably gets set to 0 since it's all put into .text
 uint8_t* program;
 uint32_t programSize;
@@ -89,31 +74,273 @@ int strcmp(char* str1, char* str2) {
 	return 0;
 }
 
+int isWhitespace(char c) {
+	return (c == ' ' || c == '\t' || c == '\n');
+}
+
+int isDelim(char c) {
+	return (isWhitespace(c) || c == ',' || c == '\0');
+}
+
+char* readToken(char* dest, char* src) {
+	while(isWhitespace(*src)) {
+		++src;
+	}
+
+	if(*src == '\0') {
+		*dest = '\0';
+		return src;
+	}
+
+	if(isDelim(*src)){
+		*dest = *src;
+		++dest;
+		++src;
+	} else {
+		while(!isDelim(*src)) {
+			*dest = *src;
+			++dest;
+			++src;
+		}
+	}
+	*dest = '\0';
+
+	return src;
+}
+
+#define INSTRUCTIONS \
+	INSTR(RET, "ret") \
+	INSTR(CLI, "cli") \
+	INSTR(HLT, "hlt") \
+	INSTR(STI, "sti") \
+	INSTR(MOV, "mov") 
+
+typedef enum {
+#define INSTR(x,y) INSTR_ ## x,
+	INSTRUCTIONS
+#undef INSTR
+	INSTRUCTION_COUNT,
+	INSTRUCTION_INVALID
+} instructionType;
+
+char* instructionNames[] = {
+#define INSTR(x,y) [INSTR_ ## x] = y,
+	INSTRUCTIONS
+#undef INSTR
+};
+
+instructionType getInstructionFromName(char* str) {
+	for(uint32_t i = 0; i < INSTRUCTION_COUNT; ++i) {
+		if(strcmp(str, instructionNames[i]) == 0) {
+			return i;
+		}
+	}
+	return INSTRUCTION_INVALID;
+}
+
+typedef enum {
+	TOKEN_INSTRUCTION,
+	TOKEN_REGISTER,
+	TOKEN_REG,
+
+	TOKEN_BYTE,
+	TOKEN_WORD,
+	TOKEN_DWORD,
+
+	TOKEN_COMMA,
+	TOKEN_L_BRACKET,
+	TOKEN_R_BRACKET,
+	TOKEN_INVALID,
+} tokenType;
+
+char* tokenNames[] = {
+	[TOKEN_INSTRUCTION] = "TOKEN_INSTRUCTION",
+	[TOKEN_REGISTER] = "TOKEN_REGISTER",
+	[TOKEN_REG] = "TOKEN_REG",
+
+	[TOKEN_BYTE] = "TOKEN_BYTE",
+	[TOKEN_WORD] = "TOKEN_WORD",
+	[TOKEN_DWORD] = "TOKEN_DWORD",
+
+	[TOKEN_COMMA] = "TOKEN_COMMA",
+	[TOKEN_L_BRACKET] = "TOKEN_L_BRACKET",
+	[TOKEN_R_BRACKET] = "TOKEN_R_BRACKET",
+	[TOKEN_INVALID] = "TOKEN_INVALID",
+};
+
+#define REGISTERS \
+	REG(EAX,"eax") \
+	REG(ECX,"ecx") \
+	REG(EDX,"edx") \
+	REG(EBX,"ebx") \
+	REG(ESP,"esp") \
+	REG(EBP,"ebp") \
+	REG(ESI,"esi") \
+	REG(EDI,"edi")
+
+typedef enum {
+#define REG(x,y) x,
+	REGISTERS
+#undef REG
+	REG_COUNT,
+} registerType;
+
+char* registerNames[] = {
+#define REG(x,y) [x] = y,
+	REGISTERS
+#undef REG
+};
+
+typedef struct {
+	tokenType type;
+	union {
+		registerType reg;
+		instructionType instr;
+	} d;
+} token;
+
+token classifyToken(char* str) {
+	token t;
+	t.type = TOKEN_INVALID;
+	if(*str == ',') {
+		t.type = TOKEN_COMMA;
+		return t;
+	}
+	if(*str == '[') {
+		t.type = TOKEN_L_BRACKET;
+		return t;
+	}
+	if(*str == ']') {
+		t.type = TOKEN_R_BRACKET;
+		return t;
+	}
+	if(strcmp(str, "byte") == 0) {
+		t.type = TOKEN_BYTE;
+		return t;
+	}
+	if(strcmp(str, "word") == 0) {
+		t.type = TOKEN_WORD;
+		return t;
+	}
+	if(strcmp(str, "dword") == 0) {
+		t.type = TOKEN_DWORD;
+		return t;
+	}
+
+	t.d.instr = getInstructionFromName(str);
+	if(t.d.instr != INSTRUCTION_INVALID) {
+		t.type = TOKEN_INSTRUCTION;
+		return t;
+	}
+
+	for(uint32_t i = 0; i < REG_COUNT; ++i) {
+		if(strcmp(str, registerNames[i]) == 0) {
+			t.type = TOKEN_REGISTER;
+			t.d.reg = i;
+			return t;
+		}
+	}
+	return t;
+}
+
+int expectToken(tokenType t, token in) {
+	if(in.type != t) {
+		sysPrint("EXPECTED ", 0);
+		sysPrint(tokenNames[t], 0);
+		sysPrint(", GOT ", 0);
+		sysPrint(tokenNames[in.type], 0);
+		sysPrint("\n", 0);
+		return 0;
+	}
+	return 1;
+}
+
 void parseFile(char* fileBuffer, uint32_t fileSize) {
-	static char lineBuffer[64];
+	static char tokenBuffer[64];
 	char* filePtr = fileBuffer;
 
 	while(*filePtr != '\0') {
-		while(*filePtr == ' ' || *filePtr == '\t' || *filePtr == '\n') {
-			++filePtr;
-		}
+		filePtr = readToken(tokenBuffer, filePtr);
+		if(tokenBuffer[0] == '\0') { break; }
 
-		char* bufferPtr = lineBuffer;
-		while(*filePtr != '\n' && *filePtr != '\0') {
-			*bufferPtr = *filePtr;
-			++bufferPtr;
-			++filePtr;
-		}
-		*bufferPtr = '\0';
+		sysPrint(tokenBuffer, 0);
+		sysPrint("\n", 1);
 
-		for(uint32_t i = 0; i < sizeof(instructions)/sizeof(instructions[0]); ++i) {
-			if(strcmp(lineBuffer, instructions[i].name) == 0) {
+		token t = classifyToken(tokenBuffer);
+		switch(t.type) {
+			case TOKEN_INSTRUCTION:
+				switch(t.d.instr) {
+					case INSTR_RET:
+						addByte(0xc3);
+						break;
+					case INSTR_CLI:
+						addByte(0xfa);
+						break;
+					case INSTR_HLT:
+						addByte(0xf4);
+						break;
+					case INSTR_MOV:
+						filePtr = readToken(tokenBuffer, filePtr);
+						t = classifyToken(tokenBuffer);
+						switch(t.type) {
+							case TOKEN_REGISTER:
+								// comma, register/dword[asdf]
+								registerType destReg = t.d.reg;
+								filePtr = readToken(tokenBuffer, filePtr);
+								t = classifyToken(tokenBuffer);
+								if(!expectToken(TOKEN_COMMA, t)) {
+									// really need to implement an exit syscall or something
+									break;
+								}
+								filePtr = readToken(tokenBuffer, filePtr);
+								t = classifyToken(tokenBuffer);
+								switch(t.type) {
+									case TOKEN_REGISTER:
+										registerType srcReg = t.d.reg;
+										addByte(0x8b);
+										addByte(0xc0 | (destReg<<3) | srcReg);
+										break;
+									default:
+										sysPrint("UNEXPECTED TOKEN: ", 0);
+										sysPrint(tokenBuffer, 0);
+										sysPrint("\n", 0);
+										break;
+								}
+								break;
+							case TOKEN_DWORD:
+								// l bracket, address/label/register, r bracket, comma, register
+								// unimplemented
+								break;
+							default:
+								sysPrint("UNEXPECTED TOKEN: ", 0);
+								sysPrint(tokenBuffer, 0);
+								sysPrint("\n", 0);
+								return;
+						}
+						break;
+					default:
+						sysPrint("UNIMPLEMENTED INSTRUCTION: ", 0);
+						sysPrint(tokenBuffer, 0);
+						sysPrint("\n", 0);
+						return;
+				}
+				break;
+			default:
+				sysPrint("UNEXPECTED TOKEN: ", 0);
+				sysPrint(tokenBuffer, 0);
+				sysPrint("\n", 0);
+				break;
+		}
+		/*for(uint32_t i = 0; i < sizeof(instructions)/sizeof(instructions[0]); ++i) {
+			if(strcmp(tokenBuffer, instructions[i].name) == 0) {
+				sysPrint("INSTR: ", 0);
 				sysPrint(instructions[i].name, 0);
+				sysPrint("\n", 1);
 				addBytes(instructions[i].bytes, instructions[i].byteCount);
 				break;
 			}
-		}
-		lineBuffer[0] = '\0';
+		}*/
+		tokenBuffer[0] = '\0';
 	}
 }
 
