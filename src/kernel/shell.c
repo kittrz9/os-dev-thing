@@ -40,6 +40,9 @@ void runShell(void) {
 		puts(cmdBuffer);
 		puts("\"\n");
 	} else {
+		// having this doesn't do anything right now
+		// but would probably be needed if I end up doing stuff like letting tasks end other tasks since then they'd not be able to return normally
+			// or if I end up implementing stuff to handle if a task ends up hitting a page fault or something
 		waitTask(addTask(launchElf, 5));
 		freeElf();
 	}

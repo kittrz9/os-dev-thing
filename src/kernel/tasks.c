@@ -5,6 +5,8 @@
 
 task currentTasks[MAX_TASKS];
 
+#define STACK_SIZE 4096
+
 uint32_t addTask(void (*func)(), uint32_t time) {
 	task* t = NULL;
 	uint32_t i = 0;
@@ -26,7 +28,7 @@ uint32_t addTask(void (*func)(), uint32_t time) {
 	t->timer = time;
 	t->timerRefresh = time;
 
-	t->stack = pageAlloc(4096); // no stack protection lmao
+	t->stack = pageAlloc(STACK_SIZE); // no stack protection lmao
 
 	t->eax = 0;
 	t->ebx = 0;
@@ -185,6 +187,7 @@ void endTask(void) {
 	serialWriteHex32(currentTaskIndex);
 	serialWriteStr("!\n");
 	currentTasks[currentTaskIndex].present = 0;
+	pageFree(currentTasks[currentTaskIndex].stack, STACK_SIZE);
 	while(1) {}
 }
 
