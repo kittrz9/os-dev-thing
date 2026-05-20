@@ -20,6 +20,8 @@ void addTask(void (*func)(), uint32_t time) {
 
 	t->present = 1;
 
+	t->state = TASK_RUNNING;
+
 	t->timer = time;
 	t->timerRefresh = time;
 
@@ -54,6 +56,9 @@ void processTasks() {
 	for(uint32_t i = 0; i < MAX_TASKS; ++i) {
 		if(currentTasks[i].sleepTimer > 0) {
 			--currentTasks[i].sleepTimer;
+			if(currentTasks[i].sleepTimer == 0) {
+				currentTasks[i].state = TASK_RUNNING;
+			}
 		}
 	}
 
@@ -89,7 +94,7 @@ void processTasks() {
 	while(currentTaskIndex != oldTaskIndex) {
 		// ideally there should always be at least one task that isn't sleeping (the kernel), so this shouldn't end up switching to a task that should be sleeping
 		// though there really should be some place that it jumps to to wait out if there's absolutely no tasks to switch to
-		if(currentTasks[currentTaskIndex].present == 1 && currentTasks[currentTaskIndex].sleepTimer == 0) {
+		if(currentTasks[currentTaskIndex].present == 1 && currentTasks[currentTaskIndex].state == TASK_RUNNING) {
 			break;
 		}
 		++currentTaskIndex;
@@ -160,13 +165,15 @@ void processTasks() {
 }
 
 void sleep(uint32_t ms) {
-	serialWriteHex32(currentTaskIndex);
-	serialWriteStr("\n");
 	currentTasks[currentTaskIndex].sleepTimer = ms;
 	// force a task switch
 	currentTasks[currentTaskIndex].timer = 1;
-	//__asm__ volatile("int $32");
-	// this still lets the current task run for a bit until the timer interrupt happens again
-	// it should switch immediately and probably reset the timer but I can't get it to do that by just forcing the interrupt with the instruction
-	// I could probably make it do it manually but I don't care enough right now
+	currentTasks[currentTaskIndex].state = TASK_SLEEPING;
+	// really janky way to force it to wait for the next timer interrupt
+	volatile taskState* asdfasdf = &currentTasks[currentTaskIndex].state;
+	while(1) {
+		if(*asdfasdf != TASK_SLEEPING) {
+			break;
+		}
+	}
 }

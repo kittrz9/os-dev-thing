@@ -8,9 +8,17 @@
 
 extern uint8_t tasksBlocked;
 
+typedef enum {
+	TASK_RUNNING,
+	TASK_SLEEPING,
+	TASK_WAITING, // will probably use this for the shell if I get around to making it a standalone task
+} taskState;
+
 typedef struct {
 	uint8_t present; // ideally should implement some sort of sorting and mark the end of the list some way
 	void* stack; // 1 page should be fine?
+
+	taskState state;
 
 	uint32_t timer;
 	uint32_t timerRefresh;
