@@ -60,9 +60,6 @@ pageFaultHandler:
 	hlt
 
 section .data
-termUpdateCounter:
-	dq 20
-
 global currentTaskRegisters
 currentTaskRegisters:
 	dd 0 ; eax
@@ -82,13 +79,9 @@ tasksBlocked:
 	db 1
 
 section .text
-; https://wiki.osdev.org/Programmable_Interval_Timer#Using_the_IRQ_to_Implement_sleep
-extern countDown
-extern drawTerm
 extern processTasks
 align 4
 timerHandler:
-
 	mov dword [currentTaskRegisters + 0*4], eax
 
 	pop eax ; eip
@@ -146,25 +139,9 @@ timerHandler:
 	jmp dword [currentTaskRegisters + 8*4] ; eip
 
 noTaskSwitch:
-	pushad
-	mov eax, [countDown]
-	test eax, eax
-	jz timerDone
-	dec eax
-	mov [countDown], eax
-timerDone:
-	; this should really be done with multitasking but whatever this works for now
-	mov eax, [termUpdateCounter]
-	dec eax
-	jnz noTermUpdate
-	call drawTerm
-	mov eax, 20
-noTermUpdate:
-	mov [termUpdateCounter], eax
 	mov al, 0x20
 	out 0x20, al
 
-	popad
 	mov eax, dword [currentTaskRegisters + 10*4]
 	push eax ; eflags
 	mov eax, dword [currentTaskRegisters + 9*4]

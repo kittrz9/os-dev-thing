@@ -3,8 +3,6 @@
 #include "io.h"
 #include "serial.h"
 
-volatile uint32_t countDown = 0;
-
 void timerSetFreqDiv(uint8_t channel, enum TIMER_MODE mode, uint16_t freqDiv) {
 	uint8_t flags = (channel<<6) | (mode << 1) | 0x30;
 	outb(PITMODE, flags);
