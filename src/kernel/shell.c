@@ -7,6 +7,7 @@
 #include "pageAlloc.h"
 #include "paging.h"
 #include "fs.h"
+#include "tasks.h"
 
 char cmdBuffer[64];
 
@@ -39,7 +40,7 @@ void runShell(void) {
 		puts(cmdBuffer);
 		puts("\"\n");
 	} else {
-		launchElf();
+		waitTask(addTask(launchElf, 5));
 		freeElf();
 	}
 }

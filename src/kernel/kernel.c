@@ -27,15 +27,23 @@ void kernelTask(void) {
 	__asm__ volatile ("cli; hlt");
 }
 void task1(void) {
+	uint8_t i = 0;
 	while(1) {
 		serialWriteStr("task 1!!!\n");
 		sleep(1000);
+		++i;
+		if(i > 10) {
+			endTask();
+		}
 	}
 }
+
 void task2(void) {
+	uint32_t taskID = addTask(task1, 5);
+	waitTask(taskID);
+	serialWriteStr("task 2 starting after waiting!\n");
 	while(1) {
-		serialWriteStr("task 2!!!\n");
-		sleep(500);
+		sleep(1000);
 	}
 }
 
@@ -64,7 +72,7 @@ void kernel(void) {
 	} while(id < 256);
 	PICClearMask(1); // keyboard
 
-	addTask(task1, 5);
+	//addTask(task1, 5);
 	addTask(task2, 5);
 	addTask(task3, 10);
 	addTask(kernelTask, 10);

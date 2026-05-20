@@ -5,6 +5,7 @@
 #include "fs.h"
 #include "pageAlloc.h"
 #include "paging.h"
+#include "tasks.h"
 
 size_t elfSize;
 void* elfBuffer;
@@ -31,6 +32,7 @@ void* loadElf(char* fileName) {
 
 void launchElf(void) {
 	loadedElfEntry();
+	endTask();
 }
 
 void freeElf(void) {

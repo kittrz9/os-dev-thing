@@ -42,11 +42,14 @@ typedef struct {
 } task;
 
 // function shouldn't return, should call some end task syscall
-void addTask(void (*func)(), uint32_t time);
+uint32_t addTask(void (*func)(), uint32_t time);
 void removeTask(void (*func)());
 
 void processTasks(void);
 
 void sleep(uint32_t ms);
+
+void endTask(void);
+void waitTask(uint32_t taskID);
 
 #endif

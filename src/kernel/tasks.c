@@ -5,9 +5,10 @@
 
 task currentTasks[MAX_TASKS];
 
-void addTask(void (*func)(), uint32_t time) {
+uint32_t addTask(void (*func)(), uint32_t time) {
 	task* t = NULL;
-	for(uint32_t i = 0; i < MAX_TASKS; ++i) {
+	uint32_t i = 0;
+	for(i = 0; i < MAX_TASKS; ++i) {
 		if(currentTasks[i].present == 0) {
 			t = &currentTasks[i];
 			break;
@@ -47,6 +48,7 @@ void addTask(void (*func)(), uint32_t time) {
 	serialWriteStr("task added, eip at: ");
 	serialWriteHex32(t->eip);
 	serialWriteStr("\n");
+	return i;
 }
 //void removeTask(void (*func)());
 
@@ -173,6 +175,26 @@ void sleep(uint32_t ms) {
 	volatile taskState* asdfasdf = &currentTasks[currentTaskIndex].state;
 	while(1) {
 		if(*asdfasdf != TASK_SLEEPING) {
+			break;
+		}
+	}
+}
+
+void endTask(void) {
+	serialWriteStr("ending task ");
+	serialWriteHex32(currentTaskIndex);
+	serialWriteStr("!\n");
+	currentTasks[currentTaskIndex].present = 0;
+	while(1) {}
+}
+
+void waitTask(uint32_t taskID) {
+	//currentTasks[currentTaskIndex].state = TASK_WAITING;
+	// should probably do this in a better way
+	// should also probably make the present flag be part of the state variable
+	volatile uint8_t* asdfasdf = &currentTasks[taskID].present;
+	while(1) {
+		if(*asdfasdf == 0) {
 			break;
 		}
 	}
