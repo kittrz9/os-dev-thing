@@ -141,7 +141,7 @@ instructionType getInstructionFromName(char* str) {
 typedef enum {
 	TOKEN_INSTRUCTION,
 	TOKEN_REGISTER,
-	TOKEN_REG,
+	TOKEN_INT,
 
 	TOKEN_BYTE,
 	TOKEN_WORD,
@@ -156,7 +156,7 @@ typedef enum {
 char* tokenNames[] = {
 	[TOKEN_INSTRUCTION] = "TOKEN_INSTRUCTION",
 	[TOKEN_REGISTER] = "TOKEN_REGISTER",
-	[TOKEN_REG] = "TOKEN_REG",
+	[TOKEN_INT] = "TOKEN_INT",
 
 	[TOKEN_BYTE] = "TOKEN_BYTE",
 	[TOKEN_WORD] = "TOKEN_WORD",
@@ -196,6 +196,7 @@ typedef struct {
 	union {
 		registerType reg;
 		instructionType instr;
+		uint32_t value;
 	} d;
 } token;
 
@@ -239,6 +240,18 @@ token classifyToken(char* str) {
 			t.d.reg = i;
 			return t;
 		}
+	}
+
+	if(str[0] >= '0' && str[0] <= '9') {
+		t.type = TOKEN_INT;
+		t.d.value = 0;
+		char* str2 = str;
+		while(*str2 >= '0' && *str2 <= '9') {
+			t.d.value *= 10;
+			t.d.value += *str2 - '0';
+			++str2;
+		}
+		return t;
 	}
 	return t;
 }
@@ -300,12 +313,55 @@ void parseFile(char* fileBuffer, uint32_t fileSize) {
 										addByte(0x8b);
 										addByte(0xc0 | (destReg<<3) | srcReg);
 										break;
+									case TOKEN_INT:
+										addByte(0xb8 + destReg);
+										addU32(t.d.value);
+										break;
+									case TOKEN_L_BRACKET:
+										filePtr = readToken(tokenBuffer, filePtr);
+										t = classifyToken(tokenBuffer);
+										if(!expectToken(TOKEN_INT, t)) {
+											break;
+										}
+										uint32_t value = t.d.value;
+										filePtr = readToken(tokenBuffer, filePtr);
+										t = classifyToken(tokenBuffer);
+										if(!expectToken(TOKEN_R_BRACKET, t)) {
+											break;
+										}
+										break;
 									default:
 										sysPrint("UNEXPECTED TOKEN: ", 0);
 										sysPrint(tokenBuffer, 0);
 										sysPrint("\n", 0);
 										break;
 								}
+								break;
+							case TOKEN_L_BRACKET:
+								filePtr = readToken(tokenBuffer, filePtr);
+								t = classifyToken(tokenBuffer);
+								if(!expectToken(TOKEN_INT, t)) {
+									break;
+								}
+								uint32_t value = t.d.value;
+								filePtr = readToken(tokenBuffer, filePtr);
+								t = classifyToken(tokenBuffer);
+								if(!expectToken(TOKEN_R_BRACKET, t)) {
+									break;
+								}
+								filePtr = readToken(tokenBuffer, filePtr);
+								t = classifyToken(tokenBuffer);
+								if(!expectToken(TOKEN_COMMA, t)) {
+									break;
+								}
+								filePtr = readToken(tokenBuffer, filePtr);
+								t = classifyToken(tokenBuffer);
+								if(!expectToken(TOKEN_REGISTER, t)) {
+									break;
+								}
+								registerType srcReg = t.d.reg;
+								addByte(0x89);
+								addByte(0x05 | (srcReg<<3));
 								break;
 							case TOKEN_DWORD:
 								// l bracket, address/label/register, r bracket, comma, register

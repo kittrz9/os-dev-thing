@@ -16,8 +16,35 @@
 #include "paging.h"
 #include "elf.h"
 #include "shell.h"
+#include "tasks.h"
 
 void loadIDT(void);
+
+void kernelTask(void) {
+	while(1) {
+		runShell();
+	}
+	__asm__ volatile ("cli; hlt");
+}
+void task1(void) {
+	while(1) {
+		serialWriteStr("task 1!!!\n");
+		sleep(1000);
+	}
+}
+void task2(void) {
+	while(1) {
+		serialWriteStr("task 2!!!\n");
+		sleep(500);
+	}
+}
+
+void task3(void) {
+	while(1) {
+		drawTerm();
+		sleep(20);
+	}
+}
 
 void kernel(void) {
 	initSerial();
@@ -30,44 +57,23 @@ void kernel(void) {
 
 	PICInit();
 
-	uint8_t id = 0;
+	uint16_t id = 0;
 	do {
 		PICSetMask(id);
 		++id;
-	} while(id != 0); // funny overflow moment
+	} while(id < 256);
 	PICClearMask(1); // keyboard
 
+	addTask(task1, 5);
+	addTask(task2, 5);
+	addTask(task3, 10);
+	addTask(kernelTask, 10);
+	
 	loadIDT();
 
-	/*mapPages((void*)0x1000000, (void*)0x401000, 0x10);
-	*(uint8_t*)0x410000 = 0;*/
-
-	/*extern uint32_t pageDir[256];
-	uint32_t testPage = 0x401000;
-	serialWriteStr("mapping page ");
-	serialWriteHex32(testPage);
-	serialWriteStr("...\n");
-	mapPage((void*)0x1000000,(void*)testPage);
-	serialWriteStr("page dir entry: ");
-	serialWriteHex32((uint32_t)pageDir[testPage >> 22]);
-	serialWriteStr("\n");
-	serialWriteStr("page table entry: ");
-	uint32_t pageTableAddr = pageDir[testPage >> 22] & 0xFFFFF000;
-	uint32_t* pageTable = (uint32_t*)VIRT_TO_PHYS(pageTableAddr);
-	serialWriteHex32(pageTable[(testPage >> 12) & 0xBFF]);
-	serialWriteStr("\n");
-	serialWriteStr("writing to page ");
-	serialWriteHex32(testPage);
-	serialWriteStr("...\n");
-	*(int*)testPage = 0xAAAAAAAA;
-	serialWriteStr("reading back from ");
-	serialWriteHex32(testPage);
-	serialWriteStr("...\n");
-	serialWriteHex32(*(int*)testPage);
-	serialWriteStr("\n");*/
 
 	//timerSetFreq(2, TIMER_SQUARE2, 440);
-	timerSetFreqDiv(0, TIMER_SQUARE2, 1194); // ~1ms
+	timerSetFreqDiv(0, TIMER_RATE, 1194); // ~1ms
 	PICClearMask(0); // timer
 	/*uint8_t tmp = inb(0x61);
 	if(tmp != (tmp|3)){
@@ -90,36 +96,8 @@ void kernel(void) {
 		printFile("TODO.md");
 	}
 
-	/*writeFile("ligma", "ligma balls!!!!!", 20);
-	printFile("ligma");*/
-	/*writeFile("1", "1", 1);
-	writeFile("2", "2", 2);
-	writeFile("3", "3", 3);
-	writeFile("4", "4", 4);
-	writeFile("5", "5", 5);*/
-	/*static uint8_t buffer[512];
-	readATA(0, 1, (uint16_t*)buffer);
-	strcpy(buffer, "waga baba bobo");
-	writeATA(0, 1, (uint16_t*)buffer);
-
-	memset(buffer, 0, sizeof(buffer));
-	readATA(0, 1, (uint16_t*)buffer);
-	puts(&buffer[0]);*/
-
-	// will eventually do this in a way that isn't garbage
-	/*if(loadElf("test.elf") == NULL) {
-		serialWriteStr("could not find test.elf");
-	} else {
-		launchElf();
-		freeElf();
-	}*/
-	
-	while(1) {
-		runShell();
-		//sleep(20);
-	}
-
-	serialWriteStr("done\n");
-
-	__asm__ volatile ("cli; hlt");
+	serialWriteStr("unblocking tasks\n");
+	tasksBlocked = 0;
+	while(1) {}
 }
+

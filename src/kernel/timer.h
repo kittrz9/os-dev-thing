@@ -10,7 +10,7 @@
 #define PITMODE 0x43
 
 enum TIMER_MODE {
-	TIMER_IRQ,
+	TIMER_INT_ON_TERM_COUNT = 0,
 	TIMER_HW_ONE,
 	TIMER_RATE,
 	TIMER_SQUARE,
@@ -22,6 +22,5 @@ enum TIMER_MODE {
 
 void timerSetFreqDiv(uint8_t channel, enum TIMER_MODE mode, uint16_t freqDiv);
 void timerSetFreq(uint8_t channel, enum TIMER_MODE mode, uint32_t freq);
-void sleep(uint32_t ms);
 
 #endif

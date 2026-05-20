@@ -62,11 +62,90 @@ pageFaultHandler:
 section .data
 termUpdateCounter:
 	dq 20
+
+global currentTaskRegisters
+currentTaskRegisters:
+	dd 0 ; eax
+	dd 0 ; ebx
+	dd 0 ; ecx
+	dd 0 ; edx
+	dd 0 ; esi
+	dd 0 ; edi
+	dd 0 ; esp
+	dd 0 ; ebp
+	dd 0 ; eip
+	dd 0 ; cs
+	dd 0 ; eflags
+
+global tasksBlocked
+tasksBlocked:
+	db 1
+
+section .text
 ; https://wiki.osdev.org/Programmable_Interval_Timer#Using_the_IRQ_to_Implement_sleep
 extern countDown
 extern drawTerm
+extern processTasks
 align 4
 timerHandler:
+
+	mov dword [currentTaskRegisters + 0*4], eax
+
+	pop eax ; eip
+	mov dword [currentTaskRegisters + 8*4], eax
+	pop eax ; cs
+	mov dword [currentTaskRegisters + 9*4], eax
+	pop eax ; eflags
+	mov dword [currentTaskRegisters + 10*4], eax
+
+	cmp byte [tasksBlocked], 0
+	jne noTaskSwitch
+	mov dword [currentTaskRegisters + 1*4], ebx
+	mov dword [currentTaskRegisters + 2*4], ecx
+	mov dword [currentTaskRegisters + 3*4], edx
+	mov dword [currentTaskRegisters + 4*4], esi
+	mov dword [currentTaskRegisters + 5*4], edi
+	mov dword [currentTaskRegisters + 6*4], esp
+	mov dword [currentTaskRegisters + 7*4], ebp
+
+
+	mov al, 0x20
+	out 0x20, al
+	in al, 0x60 ; discard scancode
+	call processTasks
+
+	mov eax, dword [currentTaskRegisters + 0*4]
+	mov ebx, dword [currentTaskRegisters + 1*4]
+	mov ecx, dword [currentTaskRegisters + 2*4]
+	mov edx, dword [currentTaskRegisters + 3*4]
+	mov esi, dword [currentTaskRegisters + 4*4]
+	mov edi, dword [currentTaskRegisters + 5*4]
+	mov esp, dword [currentTaskRegisters + 6*4]
+	mov ebp, dword [currentTaskRegisters + 7*4]
+
+	; eflags
+	mov eax, dword [currentTaskRegisters + 10*4]
+	push eax
+	popf
+
+	; code segment should be the same I think?
+
+
+	; reset timer
+	mov al, 0x30
+	out 0x43, al
+	mov al, (1194 & 0xff)
+	out 0x40, al
+	mov al, (1194 >> 8)
+	out 0x40, al
+
+	; reset eax
+	mov eax, dword [currentTaskRegisters + 0*4]
+
+	sti
+	jmp dword [currentTaskRegisters + 8*4] ; eip
+
+noTaskSwitch:
 	pushad
 	mov eax, [countDown]
 	test eax, eax
@@ -84,7 +163,15 @@ noTermUpdate:
 	mov [termUpdateCounter], eax
 	mov al, 0x20
 	out 0x20, al
+
 	popad
+	mov eax, dword [currentTaskRegisters + 10*4]
+	push eax ; eflags
+	mov eax, dword [currentTaskRegisters + 9*4]
+	push eax ; cs
+	mov eax, dword [currentTaskRegisters + 8*4]
+	push eax ; eip
+	mov eax, dword [currentTaskRegisters + 0*4]
 	iret
 
 extern handleScancode
