@@ -34,12 +34,15 @@ def main():
 	print(f"uint16_t {name}H = {img.size[1]};")
 
 
-	print(f"static const uint8_t {name}[] = {{")
+	print(f"static const uint8_t {name}[] = {{", end='')
 	for y in range(img.size[1]):
-		print("\t", end='')
-		for x in range(img.size[0]):
-			print(str(pixels[x,y][0]) + ",", end='')
-		print("")
+		#print("\t", end='')
+		asdf = 0
+		for x in range(8):
+			#print(str(pixels[x,y][0]) + ",", end='')
+			if pixels[x,y][0] > 0: asdf |= (1<<(7-x))
+			#asdf <<= 1
+		print(f"{asdf},", end='')
 
 	print("};")
 

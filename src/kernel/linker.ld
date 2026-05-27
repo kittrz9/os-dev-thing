@@ -9,18 +9,21 @@ SECTIONS {
 		*(.entry);
 	}
 	. += 0x80000000;
-	.text ALIGN(4K) : AT(ADDR(.text) - 0x80000000) {
+	/* having it set to align at 4k would probably be good for setting up page protections
+	but for now it doesn't really matter and just makes the file size of the kernel huge
+	which also doesn't matter in the slightest but I wanted to see how big the kernel was without it */
+	.text ALIGN(4) : AT(ADDR(.text) - 0x80000000) {
 		*(.text);
 	}
 
-	.rodata ALIGN(4K) : AT(ADDR(.rodata) - 0x80000000) {
+	.rodata ALIGN(4) : AT(ADDR(.rodata) - 0x80000000) {
 		*(.rodata);
 	}
 
-	.data ALIGN(4K) : AT(ADDR(.data) - 0x80000000) {
+	.data ALIGN(4) : AT(ADDR(.data) - 0x80000000) {
 		*(.data);
 	}
-	bssStart = ALIGN(4);
+	bssStart = ALIGN(4K);
 	.bss ALIGN(4K) : AT(ADDR(.bss) - 0x80000000) {
 		*(.bss);
 	}
